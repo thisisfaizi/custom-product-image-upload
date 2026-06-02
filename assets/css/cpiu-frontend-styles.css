@@ -1,0 +1,2669 @@
+/**
+ * CPIU Frontend Styles
+ * 
+ * Styles for the multi-product frontend interface
+ * 
+ * @package Custom_Product_Image_Upload
+ * @since 1.2.0
+ * 
+ * TABLE OF CONTENTS:
+ * 1. Container Styling
+ * 2. Form Elements
+ * 3. Image Preview & Upload
+ * 4. Modal Components
+ * 5. Cropper Interface
+ * 6. Progress Indicators
+ * 7. Error & Success Messages
+ * 8. Responsive Design
+ * 9. Accessibility Features
+ * 10. Browser Compatibility
+ */
+
+/* ==========================================================================
+   1. Container Styling
+   ========================================================================== */
+.cpiu-container {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.cpiu-container label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.cpiu-container input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.cpiu-container input[type="file"]:hover {
+    border-color: #0073aa;
+}
+
+.cpiu-container input[type="file"]:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+
+/* ==========================================================================
+   2. Form Elements
+   ========================================================================== */
+/* Hint Text */
+.cpiu-hint {
+    margin: 10px 0;
+    padding: 8px 12px;
+    background: #e7f3ff;
+    border-left: 4px solid #0073aa;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Crop Hint Text */
+.cpiu-container .cpiu-crop-hint {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #856404;
+    font-family: inherit;
+    line-height: 1.4;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* End Form Elements */
+
+/* ==========================================================================
+   3. Image Preview & Upload
+   ========================================================================== */
+#cpiu-image-preview {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    border: 1px dashed #ccc;
+    padding: 10px;
+    min-height: 100px;
+    background: #fff;
+    border-radius: 4px;
+}
+
+#cpiu-image-preview:empty::before {
+    content: 'No images selected yet. Choose files to see preview.';
+    color: #999;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 80px;
+}
+
+.cpiu-image-item {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.cpiu-image-item:hover {
+    border-color: #0073aa;
+    box-shadow: 0 2px 8px rgba(0, 115, 170, 0.2);
+}
+
+.cpiu-image-item img {
+    display: block;
+    max-width: 100px;
+    max-height: 100px;
+    width: auto;
+    height: auto;
+}
+
+.cpiu-delete-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #dc3232;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.cpiu-delete-image:hover {
+    background: #a00;
+}
+
+/* End Image Preview & Upload */
+
+/* Error Container */
+#cpiu-error-container {
+    color: #dc3232;
+    margin-top: 10px;
+    font-weight: bold;
+    padding: 8px 12px;
+    background: #ffeaea;
+    border-left: 4px solid #dc3232;
+    border-radius: 4px;
+    display: none;
+}
+
+/* Progress Bar */
+#cpiu-upload-progress {
+    margin-top: 15px;
+    display: none;
+}
+
+#cpiu-upload-progress>div {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+#cpiu-progress-bar {
+    height: 20px;
+    width: 0%;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 12px;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+}
+
+#cpiu-progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: cpiu-progress-shine 2s infinite;
+}
+
+@keyframes cpiu-progress-shine {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+#cpiu-progress-text {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #666;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+/* Cropper Modal */
+#cpiu-cropper-modal {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    z-index: 100001 !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 20px;
+    width: 100vw;
+    height: 100vh;
+}
+
+#cpiu-cropper-modal.show {
+    display: flex !important;
+}
+
+#cpiu-cropper-modal>div {
+    position: relative;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+#cpiu-cropper-modal h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #333;
+}
+
+#cpiu-cropper-container {
+    max-width: 500px;
+    max-height: 50vh;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#cpiu-image-to-crop {
+    max-width: 100%;
+    display: block;
+}
+
+#cpiu-cropper-modal .button {
+    margin: 5px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+#cpiu-save-cropped-image {
+    background: #0073aa;
+    color: white;
+}
+
+#cpiu-save-cropped-image:hover {
+    background: #005a87;
+}
+
+#cpiu-close-cropper-modal {
+    background: #f0f0f0;
+    color: #333;
+}
+
+#cpiu-close-cropper-modal:hover {
+    background: #e0e0e0;
+}
+
+/* Upload Loading Modal */
+#cpiu-upload-loading {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    z-index: 100002 !important;
+    justify-content: center !important;
+    align-items: center !important;
+    backdrop-filter: blur(2px);
+    animation: cpiu-modal-fade-in 0.3s ease-out;
+}
+
+#cpiu-upload-loading.show {
+    display: flex !important;
+}
+
+@keyframes cpiu-modal-fade-in {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        opacity: 1;
+        backdrop-filter: blur(2px);
+    }
+}
+
+#cpiu-upload-loading>div {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    width: 90%;
+    transform: scale(0.9);
+    animation: cpiu-modal-scale-in 0.3s ease-out forwards;
+}
+
+@keyframes cpiu-modal-scale-in {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+#cpiu-upload-loading h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.cpiu-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0073aa;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: cpiu_spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+@keyframes cpiu_spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+#cpiu-upload-status {
+    margin-bottom: 15px;
+    min-height: 20px;
+}
+
+#cpiu-upload-status p {
+    margin: 0;
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+
+/* Image Preview Items */
+#cpiu-image-preview>div {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+    vertical-align: top;
+    border: 1px solid #eee;
+    padding: 2px;
+    width: 105px;
+    height: 105px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#cpiu-image-preview>div:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#cpiu-image-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+#cpiu-image-preview button {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0;
+    z-index: 10;
+    transition: background-color 0.2s ease;
+}
+
+#cpiu-image-preview button:hover {
+    background: rgba(220, 50, 50, 0.9);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .custom-image-upload.cpiu-container {
+        margin: 15px 0;
+        padding: 10px;
+    }
+
+    #cpiu-image-preview {
+        gap: 5px;
+        padding: 8px;
+    }
+
+    #cpiu-image-preview>div {
+        width: 80px;
+        height: 80px;
+        margin: 3px;
+    }
+
+    #cpiu-cropper-modal {
+        padding: 10px;
+    }
+
+    #cpiu-cropper-modal>div {
+        padding: 15px;
+        max-width: 95vw;
+    }
+
+    #cpiu-cropper-container {
+        max-width: 100%;
+        max-height: 40vh;
+    }
+
+    #cpiu-upload-loading>div {
+        padding: 20px 30px;
+        margin: 20px;
+    }
+}
+
+/* WooCommerce Integration */
+.woocommerce .custom-image-upload.cpiu-container {
+    margin: 20px 0;
+}
+
+.woocommerce .custom-image-upload.cpiu-container label {
+    font-weight: 600;
+    color: #333;
+}
+
+.woocommerce .custom-image-upload.cpiu-container input[type="file"] {
+    border-color: #ddd;
+}
+
+.woocommerce .custom-image-upload.cpiu-container input[type="file"]:hover {
+    border-color: #a46497;
+}
+
+.woocommerce .custom-image-upload.cpiu-container input[type="file"]:focus {
+    border-color: #a46497;
+    box-shadow: 0 0 0 1px #a46497;
+}
+
+/* Accessibility */
+.custom-image-upload.cpiu-container input[type="file"]:focus-visible {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+#cpiu-image-preview button:focus-visible {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .custom-image-upload.cpiu-container {
+        border-color: #000;
+        background: #fff;
+    }
+
+    .custom-image-upload.cpiu-container input[type="file"] {
+        border-color: #000;
+    }
+
+    #cpiu-image-preview {
+        border-color: #000;
+    }
+
+    #cpiu-image-preview>div {
+        border-color: #000;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .custom-image-upload.cpiu-container input[type="file"],
+    #cpiu-progress-bar,
+    #cpiu-image-preview>div,
+    .cpiu-spinner {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* Upload Button Container */
+.cpiu-upload-button-container {
+    margin: 20px 0;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    display: block;
+    width: 100%;
+    clear: both;
+}
+
+/* Upload Button */
+.cpiu-upload-btn {
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    font-family: inherit;
+    line-height: 1.4;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Modal Styles */
+.cpiu-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100vw;
+    height: 100vh;
+}
+
+.cpiu-modal-content {
+    position: relative;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.cpiu-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+/* Modal Headings */
+.cpiu-modal h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+/* File Input */
+.cpiu-file-input {
+    display: block;
+    margin-top: 5px;
+}
+
+/* Image Preview Container */
+#cpiu-image-preview {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    border: 1px dashed #ccc;
+    padding: 10px;
+    min-height: 100px;
+}
+
+/* Crop Hint */
+.cpiu-crop-hint {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #856404;
+}
+
+/* Error Container */
+#cpiu-error-container {
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Upload Progress */
+#cpiu-upload-progress {
+    margin-top: 15px;
+}
+
+.cpiu-progress-wrapper {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+}
+
+#cpiu-progress-bar {
+    height: 20px;
+    width: 0%;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    transition: width 0.3s ease;
+}
+
+#cpiu-progress-text {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
+/* Done Button Container */
+.cpiu-done-button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Done Button */
+.cpiu-done-btn {
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+/* Cropper Modal */
+#cpiu-cropper-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100001;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100vw;
+    height: 100vh;
+}
+
+.cpiu-cropper-content {
+    position: relative;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.cpiu-cropper-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#cpiu-cropper-container {
+    max-width: 500px;
+    max-height: 50vh;
+    margin-bottom: 15px;
+}
+
+#cpiu-image-to-crop {
+    max-width: 100%;
+    display: block;
+}
+
+.cpiu-cropper-buttons {
+    text-align: center;
+    margin-top: auto;
+}
+
+#cpiu-save-cropped-image {
+    margin-right: 10px;
+}
+
+/* Upload Loading Modal */
+#cpiu-upload-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 100002;
+    justify-content: center;
+    align-items: center;
+}
+
+.cpiu-loading-content {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cpiu-loading-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.cpiu-spinner {
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: cpiu_spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+#cpiu-upload-status {
+    margin-bottom: 15px;
+}
+
+/* Image Preview Section */
+.cpiu-image-preview-section {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background: #fafafa;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    box-sizing: border-box;
+    clear: both;
+}
+
+.cpiu-image-preview-section h4 {
+    margin: 0 0 12px 0;
+    color: #333;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    line-height: 1.4;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+#cpiu-image-preview-external {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    min-height: 80px;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #d0d0d0;
+    border-radius: 6px;
+    padding: 20px;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    box-sizing: border-box;
+    margin: 0;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+#cpiu-image-preview-external:hover {
+    border-color: #b0b0b0;
+}
+
+/* Thumbnail Wrapper */
+.cpiu-image-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 90px;
+    height: 90px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid #e0e0e0;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+}
+
+.cpiu-image-wrapper:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    border-color: #0073aa;
+}
+
+/* Thumbnail Image */
+.cpiu-image-wrapper .cpiu-preview-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Delete Button on Thumbnails */
+.cpiu-image-wrapper .cpiu-delete-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    margin: 0;
+    background: #dc3545;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 18px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cpiu-image-wrapper:hover .cpiu-delete-btn {
+    opacity: 1;
+}
+
+.cpiu-image-wrapper .cpiu-delete-btn:hover {
+    background: #a71d2a;
+    transform: scale(1.15);
+}
+
+.cpiu-image-wrapper .cpiu-delete-btn:focus-visible {
+    outline: 2px solid #0073aa;
+    outline-offset: 1px;
+    opacity: 1;
+}
+
+/* No Images Message */
+.cpiu-no-images-message {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    font-family: inherit;
+    line-height: 1.6;
+    margin: 0;
+    padding: 15px 10px;
+    border: none;
+    background: none;
+    font-size: 14px;
+}
+
+/* Upload Button Inside Preview Section */
+.cpiu-upload-button-inside {
+    margin: 15px 0 0 0 !important;
+    text-align: center;
+    display: block !important;
+    width: 100%;
+}
+
+.cpiu-upload-button-inside .cpiu-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* External Crop Hint (shown when images are uploaded in external preview) */
+.cpiu-external-crop-hint {
+    width: 100%;
+    text-align: center;
+    margin: 10px 0 0 0;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+    font-family: inherit;
+    border: none;
+    background: none;
+}
+
+.cpiu-external-crop-hint strong {
+    color: #555;
+}
+
+/* WooCommerce Cart Table Images - Grid Layout - Maximum Specificity */
+body.woocommerce-cart table.cart .cpiu-cart-thumbnails,
+body.woocommerce-checkout table.cart .cpiu-cart-thumbnails,
+body #add_payment_method table.cart .cpiu-cart-thumbnails,
+.woocommerce-cart table.cart .cpiu-cart-thumbnails,
+.woocommerce-checkout table.cart .cpiu-cart-thumbnails,
+#add_payment_method table.cart .cpiu-cart-thumbnails,
+table.cart .cpiu-cart-thumbnails,
+.cpiu-cart-thumbnails {
+    display: grid;
+    gap: 2px;
+    margin: 5px 0;
+    padding: 5px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    line-height: 1;
+    max-width: 100%;
+    box-sizing: border-box;
+    width: 100%;
+    clear: both;
+}
+
+body.woocommerce-cart table.cart .cpiu-order-image-container,
+body.woocommerce-checkout table.cart .cpiu-order-image-container,
+body #add_payment_method table.cart .cpiu-order-image-container,
+.woocommerce-cart table.cart .cpiu-order-image-container,
+.woocommerce-checkout table.cart .cpiu-order-image-container,
+#add_payment_method table.cart .cpiu-order-image-container,
+table.cart .cpiu-order-image-container,
+.cpiu-order-image-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin: 0;
+    padding: 0;
+    float: none;
+    position: relative;
+    flex-shrink: 0;
+}
+
+body.woocommerce-cart table.cart .cpiu-order-image-container:hover,
+body.woocommerce-checkout table.cart .cpiu-order-image-container:hover,
+body #add_payment_method table.cart .cpiu-order-image-container:hover,
+.woocommerce-cart table.cart .cpiu-order-image-container:hover,
+.woocommerce-checkout table.cart .cpiu-order-image-container:hover,
+#add_payment_method table.cart .cpiu-order-image-container:hover,
+table.cart .cpiu-order-image-container:hover,
+.cpiu-order-image-container:hover {
+    border-color: #007cba;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+body.woocommerce-cart table.cart img.cpiu-order-image,
+body.woocommerce-checkout table.cart img.cpiu-order-image,
+body #add_payment_method table.cart img.cpiu-order-image,
+.woocommerce-cart table.cart img.cpiu-order-image,
+.woocommerce-checkout table.cart img.cpiu-order-image,
+#add_payment_method table.cart img.cpiu-order-image,
+table.cart img.cpiu-order-image,
+img.cpiu-order-image,
+body.woocommerce-cart table.cart .cpiu-cart-thumbnails img,
+body.woocommerce-checkout table.cart .cpiu-cart-thumbnails img,
+body #add_payment_method table.cart .cpiu-cart-thumbnails img,
+.woocommerce-cart table.cart .cpiu-cart-thumbnails img,
+.woocommerce-checkout table.cart .cpiu-cart-thumbnails img,
+#add_payment_method table.cart .cpiu-cart-thumbnails img,
+table.cart .cpiu-cart-thumbnails img,
+.cpiu-cart-thumbnails img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 1px;
+    display: block;
+    border: none;
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+    max-height: 100%;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+
+/* Order Item Images */
+.cpiu-order-item-images {
+    margin-top: 8px;
+}
+
+.cpiu-order-item-images strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.cpiu-order-item-images a {
+    display: inline-block;
+    margin: 3px 3px 3px 0;
+}
+
+.cpiu-order-item-images img {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ddd;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+/* Admin Order Item Images */
+.cpiu-admin-order-item-images {
+    margin-top: 5px;
+}
+
+.cpiu-admin-order-item-images strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.cpiu-admin-order-item-images a {
+    display: inline-block;
+    margin: 2px 2px 2px 0;
+}
+
+.cpiu-admin-order-item-images img {
+    width: 45px;
+    height: 45px;
+    border: 1px solid #ccc;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+/* WooCommerce specific container styling */
+.woocommerce .cpiu-upload-button-container,
+.single-product .cpiu-upload-button-container,
+.product .cpiu-upload-button-container {
+    margin: 20px 0;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    display: block;
+    width: 100%;
+    clear: both;
+}
+
+/* Upload Button */
+.cpiu-upload-btn {
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    font-family: inherit;
+    line-height: 1.4;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Modal Styles */
+.cpiu-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100vw;
+    height: 100vh;
+}
+
+.cpiu-modal-content {
+    position: relative;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.cpiu-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+/* Modal Headings */
+.cpiu-modal h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+/* File Input */
+.cpiu-file-input {
+    display: block;
+    margin-top: 5px;
+}
+
+/* Image Preview Container */
+#cpiu-image-preview {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    border: 1px dashed #ccc;
+    padding: 10px;
+    min-height: 100px;
+}
+
+/* Crop Hint */
+.cpiu-crop-hint {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #856404;
+}
+
+/* Error Container */
+#cpiu-error-container {
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Upload Progress */
+#cpiu-upload-progress {
+    margin-top: 15px;
+}
+
+.cpiu-progress-wrapper {
+    width: 100%;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+}
+
+#cpiu-progress-bar {
+    height: 20px;
+    width: 0%;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    transition: width 0.3s ease;
+}
+
+#cpiu-progress-text {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
+/* Done Button Container */
+.cpiu-done-button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Done Button */
+.cpiu-done-btn {
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+/* Cropper Modal */
+#cpiu-cropper-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100001;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100vw;
+    height: 100vh;
+}
+
+.cpiu-cropper-content {
+    position: relative;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.cpiu-cropper-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#cpiu-cropper-container {
+    max-width: 500px;
+    max-height: 50vh;
+    margin-bottom: 15px;
+}
+
+#cpiu-image-to-crop {
+    max-width: 100%;
+    display: block;
+}
+
+.cpiu-cropper-buttons {
+    text-align: center;
+    margin-top: auto;
+}
+
+#cpiu-save-cropped-image {
+    margin-right: 10px;
+}
+
+/* Upload Loading Modal */
+#cpiu-upload-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 100002;
+    justify-content: center;
+    align-items: center;
+}
+
+.cpiu-loading-content {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cpiu-loading-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.cpiu-spinner {
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: cpiu_spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+#cpiu-upload-status {
+    margin-bottom: 15px;
+}
+
+/* Image Preview Section */
+.cpiu-image-preview-section {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #f9f9f9;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    box-sizing: border-box;
+    clear: both;
+}
+
+.cpiu-image-preview-section h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    line-height: 1.4;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+#cpiu-image-preview-external {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-height: 60px;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    box-sizing: border-box;
+    margin: 0;
+    outline: none;
+}
+
+.cpiu-no-images-message {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    font-family: inherit;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+/* Cart Thumbnails */
+.cpiu-cart-thumbnails {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important;
+    gap: 8px !important;
+    margin-top: 10px !important;
+    padding: 10px !important;
+    background: #f9f9f9 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    line-height: 1;
+}
+
+.cpiu-cart-thumbnails img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 6px !important;
+    display: block !important;
+}
+
+/* Order Item Images */
+.cpiu-order-item-images {
+    margin-top: 8px;
+}
+
+.cpiu-order-item-images strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.cpiu-order-item-images a {
+    display: inline-block;
+    margin: 3px 3px 3px 0;
+}
+
+.cpiu-order-item-images img {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ddd;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+/* Admin Order Item Images */
+.cpiu-admin-order-item-images {
+    margin-top: 5px;
+}
+
+.cpiu-admin-order-item-images strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.cpiu-admin-order-item-images a {
+    display: inline-block;
+    margin: 2px 2px 2px 0;
+}
+
+.cpiu-admin-order-item-images img {
+    width: 45px;
+    height: 45px;
+    border: 1px solid #ccc;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+/* WooCommerce specific container styling */
+.woocommerce .cpiu-upload-button-container,
+.single-product .cpiu-upload-button-container,
+.product .cpiu-upload-button-container {
+    margin: 20px 0;
+    clear: both;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+/* CPIU Button Base Styles - Using proper specificity */
+.cpiu-upload-btn,
+.cpiu-done-btn {
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    font-family: inherit;
+    line-height: 1.4;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* WooCommerce specific button styling */
+.woocommerce .cpiu-upload-btn,
+.single-product .cpiu-upload-btn,
+.product .cpiu-upload-btn {
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    font-family: inherit;
+    line-height: 1.4;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Done button specific styling */
+.cpiu-modal-content .cpiu-done-btn {
+    background-color: inherit;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    font-family: inherit;
+    line-height: 1.4;
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0;
+    outline: none;
+}
+
+/* Button hover states - using proper specificity */
+.cpiu-upload-btn:hover,
+.cpiu-done-btn:hover {
+    filter: brightness(90%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    color: white;
+    text-decoration: none;
+}
+
+/* WooCommerce specific hover states */
+.woocommerce .cpiu-upload-btn:hover,
+.single-product .cpiu-upload-btn:hover,
+.product .cpiu-upload-btn:hover {
+    filter: brightness(90%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    color: white;
+    text-decoration: none;
+}
+
+/* Done button hover state */
+.cpiu-modal-content .cpiu-done-btn:hover {
+    filter: brightness(90%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    color: white;
+    text-decoration: none;
+    background-color: inherit;
+}
+
+/* Upload Modal Styling - Ultra High Specificity */
+#cpiu-upload-modal.cpiu-modal {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    z-index: 99999 !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 20px !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    border: none !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    isolation: isolate !important;
+}
+
+#cpiu-upload-modal.cpiu-modal.show {
+    display: flex !important;
+}
+
+/* Prevent theme interference with modal */
+body.cpiu-modal-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+}
+
+#cpiu-upload-modal .cpiu-modal-content {
+    position: relative !important;
+    background: #fff !important;
+    padding: 30px !important;
+    border-radius: 8px !important;
+    max-width: 600px !important;
+    max-height: 90vh !important;
+    overflow: auto !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border: none !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    isolation: isolate !important;
+    z-index: 1 !important;
+}
+
+#cpiu-close-upload-modal.cpiu-close-btn {
+    position: absolute !important;
+    top: 15px !important;
+    right: 20px !important;
+    background: none !important;
+    border: none !important;
+    font-size: 24px !important;
+    cursor: pointer !important;
+    color: #999 !important;
+    width: 30px;
+    height: 30px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 2 !important;
+    isolation: isolate;
+    font-family: inherit;
+    line-height: 1;
+    text-align: center;
+    user-select: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
+}
+
+#cpiu-close-upload-modal.cpiu-close-btn:hover {
+    background: #f0f0f0 !important;
+    color: #333 !important;
+    text-decoration: none;
+}
+
+/* Theme Conflict Fixes */
+/* Fix for theme conflicts with product details layout */
+.product-row {
+    display: flex !important;
+    align-items: center !important;
+    flex-flow: wrap !important;
+    flex-direction: row !important;
+}
+
+.custom-image-upload.cpiu-container {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* Ensure our upload container doesn't interfere with theme layouts */
+.custom-image-upload.cpiu-container {
+    clear: both;
+    position: relative;
+    z-index: 1;
+}
+
+/* Override any theme flexbox conflicts */
+.custom-image-upload.cpiu-container * {
+    box-sizing: border-box;
+}
+
+/* Ensure proper spacing in theme layouts */
+.woocommerce .custom-image-upload.cpiu-container,
+.single-product .custom-image-upload.cpiu-container {
+    margin: 20px 0;
+    clear: both;
+}
+
+/* External Image Preview Section - High Specificity */
+.woocommerce .cpiu-image-preview-section,
+.single-product .cpiu-image-preview-section,
+.product .cpiu-image-preview-section {
+    margin-top: 20px !important;
+    padding: 15px !important;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px !important;
+    background: #f9f9f9;
+    position: relative !important;
+    z-index: 1 !important;
+    isolation: isolate !important;
+    box-sizing: border-box !important;
+    clear: both !important;
+}
+
+.woocommerce .cpiu-image-preview-section h4,
+.single-product .cpiu-image-preview-section h4,
+.product .cpiu-image-preview-section h4 {
+    margin: 0 0 15px 0 !important;
+    color: #333 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    line-height: 1.4 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+}
+
+#cpiu-image-preview-external {
+    display: flex !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    min-height: 60px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 2px dashed #ddd !important;
+    border-radius: 4px !important;
+    padding: 15px !important;
+    background: #fff !important;
+    position: relative !important;
+    z-index: 1 !important;
+    isolation: isolate !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    outline: none !important;
+}
+
+.cpiu-no-images-message {
+    color: #999 !important;
+    font-style: italic !important;
+    text-align: center !important;
+    font-family: inherit !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+}
+
+/* Prevent conflicts with common themes and plugins */
+.cpiu-upload-button-container *,
+.cpiu-image-preview-section *,
+#cpiu-upload-modal *,
+#cpiu-upload-modal .cpiu-modal-content * {
+    box-sizing: border-box !important;
+    font-family: inherit !important;
+}
+
+/* Override common theme button styles */
+.woocommerce .cpiu-upload-btn,
+.single-product .cpiu-upload-btn,
+.product .cpiu-upload-btn,
+#cpiu-open-upload-modal {
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+    text-indent: 0 !important;
+    text-shadow: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    -moz-filter: none !important;
+    -ms-filter: none !important;
+    -o-filter: none !important;
+}
+
+/* Prevent theme form styling conflicts */
+#cpiu-upload-modal input,
+#cpiu-upload-modal button,
+#cpiu-upload-modal select,
+#cpiu-upload-modal textarea {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* Theme conflict prevention for buttons - minimal !important usage */
+.cpiu-upload-btn,
+.cpiu-done-btn {
+    text-transform: none;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-indent: 0;
+    text-shadow: none;
+    filter: none;
+    -webkit-filter: none;
+    -moz-filter: none;
+    -ms-filter: none;
+    -o-filter: none;
+}
+
+/* Cropper modal buttons styling */
+#cpiu-save-cropped-image,
+#cpiu-close-cropper-modal {
+    background: #0073aa;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    text-transform: none;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-indent: 0;
+    text-shadow: none;
+    filter: none;
+    -webkit-filter: none;
+    -moz-filter: none;
+    -ms-filter: none;
+    -o-filter: none;
+}
+
+#cpiu-save-cropped-image:hover,
+#cpiu-close-cropper-modal:hover {
+    background: #005a87;
+}
+
+#cpiu-close-cropper-modal {
+    background: #f0f0f0;
+    color: #333;
+}
+
+#cpiu-close-cropper-modal:hover {
+    background: #e0e0e0;
+}
+
+/* Prevent theme animation conflicts */
+.cpiu-upload-button-container,
+.cpiu-image-preview-section,
+#cpiu-upload-modal,
+#cpiu-upload-modal .cpiu-modal-content {
+    animation: none !important;
+    -webkit-animation: none !important;
+    -moz-animation: none !important;
+    -o-animation: none !important;
+    -ms-animation: none !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -o-transform: none !important;
+    -ms-transform: none !important;
+}
+
+/* Cropper Modal Styles */
+.cpiu-cropper-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100001;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    width: 100vw;
+    height: 100vh;
+}
+
+.cpiu-cropper-modal-content {
+    position: relative;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.cpiu-cropper-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.cpiu-cropper-container {
+    max-width: 500px;
+    max-height: 50vh;
+    margin-bottom: 15px;
+}
+
+.cpiu-image-to-crop {
+    max-width: 100%;
+    display: block;
+}
+
+.cpiu-cropper-actions {
+    text-align: center;
+    margin-top: auto;
+}
+
+.cpiu-save-crop-btn {
+    margin-right: 10px;
+}
+
+/* Upload Loading Modal Styles */
+.cpiu-upload-loading-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 100002;
+    justify-content: center;
+    align-items: center;
+}
+
+.cpiu-upload-loading-content {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cpiu-upload-loading-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.cpiu-spinner {
+    border: 5px solid #f3f3f3;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: cpiu_spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+.cpiu-upload-status {
+    margin-bottom: 15px;
+}
+
+/* Image Preview Section Styles */
+.cpiu-image-preview-section {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #f9f9f9;
+    width: 100%;
+    flex: 1 1 100%;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    box-sizing: border-box;
+    clear: both;
+    display: block;
+    /* Force block context */
+}
+
+/* Force Elementor Add to Cart form to wrap items */
+:is(.elementor-widget-woocommerce-product-add-to-cart, .woocommerce div.product .elementor-widget-woocommerce-product-add-to-cart, .elementor-widget-wc-add-to-cart, .woocommerce div.product .elementor-widget-wc-add-to-cart) form.cart.variations_form .woocommerce-variation-add-to-cart,
+:is(.elementor-widget-woocommerce-product-add-to-cart, .woocommerce div.product .elementor-widget-woocommerce-product-add-to-cart, .elementor-widget-wc-add-to-cart, .woocommerce div.product .elementor-widget-wc-add-to-cart) form.cart:not(.grouped_form):not(.variations_form) {
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+.cpiu-preview-title {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    line-height: 1.4;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+.cpiu-image-preview-external {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-height: 60px;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    box-sizing: border-box;
+    margin: 0;
+    outline: none;
+}
+
+.cpiu-no-images-message {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    font-family: inherit;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+/* WooCommerce Blocks Cart and Checkout Support */
+.wc-block-cart .wc-block-components-product-details__uploaded-images,
+.wc-block-checkout .wc-block-components-product-details__uploaded-images,
+.wp-block-woocommerce-cart .wc-block-components-product-details__uploaded-images,
+.wp-block-woocommerce-checkout .wc-block-components-product-details__uploaded-images {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin: 10px 0 !important;
+    padding: 0 !important;
+}
+
+.wc-block-cart .wc-block-components-product-details__name,
+.wc-block-checkout .wc-block-components-product-details__name,
+.wp-block-woocommerce-cart .wc-block-components-product-details__name,
+.wp-block-woocommerce-checkout .wc-block-components-product-details__name {
+    font-weight: 600 !important;
+    color: #333 !important;
+    margin-bottom: 5px !important;
+    display: block !important;
+}
+
+.wc-block-cart .wc-block-components-product-details__value,
+.wc-block-checkout .wc-block-components-product-details__value,
+.wp-block-woocommerce-cart .wc-block-components-product-details__value,
+.wp-block-woocommerce-checkout .wc-block-components-product-details__value {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* WooCommerce Blocks - Cart Thumbnails */
+.wc-block-cart .cpiu-cart-thumbnails,
+.wc-block-checkout .cpiu-cart-thumbnails,
+.wp-block-woocommerce-cart .cpiu-cart-thumbnails,
+.wp-block-woocommerce-checkout .cpiu-cart-thumbnails {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)) !important;
+    gap: 4px !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    background: #f9f9f9 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    max-width: 200px !important;
+    box-sizing: border-box !important;
+}
+
+.wc-block-cart .cpiu-order-image-container,
+.wc-block-checkout .cpiu-order-image-container,
+.wp-block-woocommerce-cart .cpiu-order-image-container,
+.wp-block-woocommerce-checkout .cpiu-order-image-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 4px !important;
+    background: #fff !important;
+    overflow: hidden !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+}
+
+.wc-block-cart .cpiu-order-image-container:hover,
+.wc-block-checkout .cpiu-order-image-container:hover,
+.wp-block-woocommerce-cart .cpiu-order-image-container:hover,
+.wp-block-woocommerce-checkout .cpiu-order-image-container:hover {
+    border-color: #007cba !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-1px) !important;
+}
+
+.wc-block-cart .cpiu-order-image,
+.wc-block-checkout .cpiu-order-image,
+.wp-block-woocommerce-cart .cpiu-order-image,
+.wp-block-woocommerce-checkout .cpiu-order-image,
+.wc-block-cart .cpiu-cart-thumbnails img,
+.wc-block-checkout .cpiu-cart-thumbnails img,
+.wp-block-woocommerce-cart .cpiu-cart-thumbnails img,
+.wp-block-woocommerce-checkout .cpiu-cart-thumbnails img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 3px !important;
+    display: block !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    vertical-align: top !important;
+    box-sizing: border-box !important;
+}
+
+/* Responsive adjustments for WooCommerce Blocks */
+@media (max-width: 768px) {
+
+    .wc-block-cart .cpiu-cart-thumbnails,
+    .wc-block-checkout .cpiu-cart-thumbnails,
+    .wp-block-woocommerce-cart .cpiu-cart-thumbnails,
+    .wp-block-woocommerce-checkout .cpiu-cart-thumbnails {
+        grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)) !important;
+        max-width: 150px !important;
+        gap: 3px !important;
+        padding: 6px !important;
+    }
+
+    .wc-block-cart .cpiu-order-image-container,
+    .wc-block-checkout .cpiu-order-image-container,
+    .wp-block-woocommerce-cart .cpiu-order-image-container,
+    .wp-block-woocommerce-checkout .cpiu-order-image-container {
+        width: 35px !important;
+        height: 35px !important;
+        min-width: 35px !important;
+        min-height: 35px !important;
+        max-width: 35px !important;
+        max-height: 35px !important;
+    }
+}
+
+/* Cart and Order Image Styles - Enhanced Specificity */
+.woocommerce .cpiu-cart-image-container,
+.woocommerce .cpiu-order-image-container,
+.cpiu-cart-image-container,
+.cpiu-order-image-container,
+div.cpiu-cart-image-container,
+div.cpiu-order-image-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    min-height: 60px !important;
+    max-width: 60px !important;
+    max-height: 60px !important;
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.3s ease !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    position: relative !important;
+}
+
+.woocommerce .cpiu-cart-image-container:hover,
+.woocommerce .cpiu-order-image-container:hover,
+.cpiu-cart-image-container:hover,
+.cpiu-order-image-container:hover,
+div.cpiu-cart-image-container:hover,
+div.cpiu-order-image-container:hover {
+    border-color: #007cba !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+.woocommerce .cpiu-cart-image,
+.woocommerce .cpiu-order-image,
+.cpiu-cart-image,
+.cpiu-order-image,
+div.cpiu-cart-image-container img.cpiu-cart-image,
+div.cpiu-order-image-container img.cpiu-order-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 6px !important;
+    display: block !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    vertical-align: top !important;
+}
+
+/* Cart Thumbnails Styles - Enhanced Specificity */
+.woocommerce .cpiu-cart-thumbnails,
+.cpiu-cart-thumbnails,
+div.cpiu-cart-thumbnails {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important;
+    gap: 8px !important;
+    margin-top: 10px !important;
+    padding: 10px !important;
+    background: #f9f9f9 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 6px !important;
+    line-height: 1 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Order Item Images Styles */
+.cpiu-order-item-images {
+    margin-top: 8px;
+}
+
+.cpiu-order-images-title {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.cpiu-order-image-link {
+    display: inline-block;
+    margin: 3px 3px 3px 0;
+}
+
+.cpiu-order-image-thumb {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ddd;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+/* Admin Order Item Images Styles */
+.cpiu-admin-order-item-images {
+    margin-top: 5px;
+}
+
+.cpiu-admin-order-images-title {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.cpiu-admin-order-image-link {
+    display: inline-block;
+    margin: 2px 2px 2px 0;
+}
+
+.cpiu-admin-order-image-thumb {
+    width: 45px;
+    height: 45px;
+    border: 1px solid #ccc;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+/* ==========================================================================
+   11. Dynamic Styling Classes
+   ========================================================================== */
+
+/* Dynamic background color for buttons and progress bars */
+.cpiu-container .cpiu-dynamic-bg[data-bg-color] {
+    background-color: var(--cpiu-bg-color, #0073aa);
+    color: white;
+}
+
+/* Dynamic border color for spinners */
+.cpiu-container .cpiu-dynamic-border[data-border-color] {
+    border-top-color: var(--cpiu-border-color, #0073aa);
+}
+
+/* Body scroll prevention for modals */
+.cpiu-no-scroll {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+}
+
+/* Image wrapper styles */
+.cpiu-image-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+    vertical-align: top;
+    border: 1px solid #eee;
+    padding: 2px;
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.cpiu-image-wrapper-large {
+    position: relative;
+    display: inline-block;
+    margin: 5px;
+    vertical-align: top;
+    border: 1px solid #eee;
+    padding: 2px;
+    width: 105px;
+    height: 105px;
+    overflow: hidden;
+}
+
+/* Preview image styles */
+.cpiu-preview-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.cpiu-preview-image-large {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+/* Delete button styles */
+.cpiu-delete-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    line-height: 16px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0;
+    z-index: 10;
+}
+
+.cpiu-delete-btn-large {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0;
+    z-index: 10;
+}
+
+/* No images message */
+.cpiu-no-images-message {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Notice styles */
+.cpiu-notice {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100002;
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 400px;
+    word-wrap: break-word;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.cpiu-notice-error {
+    background: #dc3545;
+}
+
+.cpiu-notice-success {
+    background: #28a745;
+}
+
+.cpiu-notice-exit {
+    animation: slideInRight 0.3s ease-out reverse;
+}
+
+/* Show/hide utility class */
+.cpiu-container .cpiu-show {
+    display: block;
+}
+
+@media screen and (max-width: 768px) {
+    #cpiu-upload-modal.cpiu-modal {
+        padding: 10px !important;
+    }
+
+    #cpiu-upload-modal .cpiu-modal-content {
+        padding: 20px !important;
+        max-width: 95vw !important;
+        max-height: 95vh !important;
+    }
+
+    .woocommerce .cpiu-upload-btn,
+    .single-product .cpiu-upload-btn,
+    .product .cpiu-upload-btn,
+    #cpiu-open-upload-modal {
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    .woocommerce .cpiu-image-preview-section,
+    .single-product .cpiu-image-preview-section,
+    .product .cpiu-image-preview-section {
+        margin-top: 15px !important;
+        padding: 10px !important;
+    }
+
+    #cpiu-image-preview-external {
+        padding: 10px !important;
+        gap: 5px !important;
+    }
+}
+
+
+/* ==========================================================================
+   12. Shape Selector & Restore Button
+   ========================================================================== */
+
+/* Shape Selector Container */
+.cpiu-shape-selector-container {
+    margin-bottom: 18px;
+    text-align: center;
+    background: transparent;
+    padding: 12px 16px;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+}
+
+.cpiu-shape-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 12px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.cpiu-shape-buttons {
+    display: inline-flex;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 4px;
+}
+
+/* Shape Button — specificity override for theme conflicts */
+.cpiu-shape-buttons .cpiu-shape-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border: none !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #64748b !important;
+    transition: all 0.2s ease;
+    box-shadow: none !important;
+    white-space: nowrap;
+    position: relative;
+    outline: none !important;
+    line-height: 1.4;
+    min-height: auto;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.cpiu-shape-buttons .cpiu-shape-btn:hover {
+    background: rgba(255, 255, 255, 0.6) !important;
+    color: #334155 !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none;
+}
+
+.cpiu-shape-buttons .cpiu-shape-btn.active {
+    background: #fff !important;
+    border: none !important;
+    color: #0f172a !important;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+    transform: none;
+}
+
+.cpiu-shape-btn.active .cpiu-shape-icon {
+    filter: none;
+}
+
+.cpiu-shape-icon {
+    font-size: 13px;
+    line-height: 1;
+    transition: none;
+}
+
+/* Restore Button */
+.cpiu-restore-btn {
+    background: #6c757d !important;
+    /* Secondary grey color */
+    color: white !important;
+}
+
+.cpiu-restore-btn:hover {
+    background: #5a6268 !important;
+}
+
+/* Cropper View Masking (Visual Feedback) */
+.cropper-view-box.cpiu-shape-circle {
+    border-radius: 50%;
+    outline: 2px solid #fff;
+    /* Optional: adds a white border to make it distinct */
+}
+
+.cropper-view-box.cpiu-shape-heart {
+    /* Heart shape masking using SVG data URI */
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 438.82"><path d="M438.82 41.18c-54.9-54.9-143.92-54.9-198.82 0-54.9-54.9-143.92-54.9-198.82 0-54.9 54.9-54.9 143.92 0 198.82L240 438.82 438.82 240c54.9-54.9 54.9-143.92 0-198.82Z"/></svg>');
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 438.82"><path d="M438.82 41.18c-54.9-54.9-143.92-54.9-198.82 0-54.9-54.9-143.92-54.9-198.82 0-54.9 54.9-54.9 143.92 0 198.82L240 438.82 438.82 240c54.9-54.9 54.9-143.92 0-198.82Z"/></svg>');
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    outline: none;
+    /* Remove default outline if any */
+    background-color: transparent !important;
+    /* Ensure background is transparent for mask to work cleanly */
+}
+
+/* White Outline for Heart Shape */
+.cropper-view-box.cpiu-shape-heart::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* SVG stroke heart */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 438.82"><path fill="none" stroke="white" stroke-width="4" d="M438.82 41.18c-54.9-54.9-143.92-54.9-198.82 0-54.9-54.9-143.92-54.9-198.82 0-54.9 54.9-54.9 143.92 0 198.82L240 438.82 438.82 240c54.9-54.9 54.9-143.92 0-198.82Z"/></svg>');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    /* Allow clicks to pass through */
+    z-index: 100;
+}

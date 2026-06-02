@@ -1,0 +1,1328 @@
+/**
+ * CPIU Admin Styles
+ * 
+ * Styles for the multi-product admin interface
+ * 
+ * @package Custom_Product_Image_Upload
+ * @since 1.2.0
+ * 
+ * TABLE OF CONTENTS:
+ * 1. Tab Navigation
+ * 2. Tab Content
+ * 3. Form Elements
+ * 4. Product Search & Selection
+ * 5. Configuration Tables
+ * 6. Buttons & Actions
+ * 7. Modals & Overlays
+ * 8. Notices & Messages
+ * 9. File Upload & Progress
+ * 10. Responsive Design
+ */
+
+/* ==========================================================================
+   1. Tab Navigation
+   ========================================================================== */
+.cpiu-tab-nav {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.cpiu-tab-nav .nav-tab {
+    margin-left: 0;
+    margin-right: 4px;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.cpiu-tab-nav .nav-tab:hover {
+    background-color: #f0f0f1;
+    border-bottom-color: #2271b1;
+}
+
+.cpiu-tab-nav .nav-tab-active {
+    background-color: #fff;
+    border-bottom-color: #2271b1;
+    color: #2271b1;
+}
+
+.nav-tab .dashicons {
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* ==========================================================================
+   2. Tab Content
+   ========================================================================== */
+.cpiu-tab-content {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-top: none;
+    padding: 20px;
+    min-height: 400px;
+}
+
+.cpiu-tab-pane {
+    display: none;
+}
+
+.cpiu-tab-pane.active {
+    display: block;
+}
+
+/* End Tab Content */
+
+/* ==========================================================================
+   3. Form Elements
+   ========================================================================== */
+.cpiu-section {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+}
+
+.cpiu-section h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #2271b1;
+    color: #1d2327;
+    font-size: 1.3em;
+}
+
+/* 3. Form Elements */
+.cpiu-form {
+    max-width: 100%;
+}
+
+.cpiu-admin-page .form-table th {
+    width: 200px;
+    padding: 15px 10px 15px 0;
+}
+
+.cpiu-admin-page .form-table td {
+    padding: 15px 10px;
+}
+
+.cpiu-admin-page .description {
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* End Form Elements */
+
+/* ==========================================================================
+   4. Product Search & Selection
+   ========================================================================== */
+.cpiu-product-select {
+    min-width: 300px;
+}
+
+.cpiu-admin-page .select2-container--default .select2-selection--single {
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    height: 30px;
+    line-height: 28px;
+}
+
+.cpiu-admin-page .select2-container--default .select2-selection--multiple {
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    min-height: 30px;
+}
+
+.cpiu-admin-page .select2-selection__rendered {
+    line-height: 28px;
+    padding-left: 8px;
+    padding-right: 20px;
+}
+
+.cpiu-admin-page .select2-selection__arrow {
+    height: 28px;
+}
+
+.cpiu-admin-page .select2-dropdown {
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+}
+
+.cpiu-admin-page .select2-results__option {
+    padding: 6px 12px;
+}
+
+.cpiu-admin-page .select2-results__option--highlighted[aria-selected] {
+    background-color: #0073aa;
+}
+
+/* Product Option Styling */
+.cpiu-product-option {
+    padding: 5px 0;
+}
+
+.cpiu-product-option strong {
+    color: #1d2327;
+    font-weight: 600;
+}
+
+/* Color Picker Styling */
+.cpiu-color-field {
+    width: 100px;
+}
+
+.wp-picker-container {
+    display: inline-block;
+}
+
+/* Checkbox Styling */
+.cpiu-admin-page input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.cpiu-admin-page label {
+    font-weight: normal;
+    margin-right: 15px;
+}
+
+/* End Product Search & Selection */
+
+/* ==========================================================================
+   5. Configuration Tables
+   ========================================================================== */
+.submit {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.button-primary {
+    background: #0073aa;
+    border-color: #0073aa;
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 15px;
+    border-radius: 3px;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: normal;
+    margin-right: 10px;
+}
+
+.button-primary:hover {
+    background: #005a87;
+    border-color: #005a87;
+}
+
+/* Table Styling */
+.cpiu-configurations-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.cpiu-configurations-table th,
+.cpiu-configurations-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.cpiu-configurations-table th {
+    background-color: #f9f9f9;
+    font-weight: 600;
+}
+
+.cpiu-configurations-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Status Indicators */
+.cpiu-status-enabled {
+    color: #46b450;
+    font-weight: 600;
+}
+
+.cpiu-status-disabled {
+    color: #dc3232;
+    font-weight: 600;
+}
+
+.cpiu-deleted-product {
+    color: #dc3232;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+/* End Configuration Tables */
+
+/* ==========================================================================
+   6. Buttons & Actions
+   ========================================================================== */
+.cpiu-bulk-actions {
+    margin-bottom: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.cpiu-admin-page .button {
+    margin-right: 10px;
+}
+
+.cpiu-admin-page .button-link-delete {
+    color: #dc3232;
+    border-color: #dc3232;
+}
+
+.cpiu-admin-page .button-link-delete:hover {
+    background: #dc3232;
+    color: #fff;
+}
+
+/* Checkbox Column */
+.check-column {
+    width: 30px;
+    text-align: center;
+}
+
+.check-column input[type="checkbox"] {
+    margin: 0;
+}
+
+/* Action Buttons */
+.cpiu-edit-config,
+.cpiu-delete-config {
+    margin-right: 5px;
+    font-size: 12px;
+    padding: 3px 8px;
+}
+
+.cpiu-delete-config {
+    color: #dc3232;
+    border-color: #dc3232;
+}
+
+.cpiu-delete-config:hover {
+    background: #dc3232;
+    color: #fff;
+}
+
+/* End Buttons & Actions */
+
+/* ==========================================================================
+   7. Modals & Overlays
+   ========================================================================== */
+/* Loading States */
+.cpiu-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.cpiu-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #0073aa;
+    border-radius: 50%;
+    animation: cpiu-spin 1s linear infinite;
+}
+
+@keyframes cpiu-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Conditional settings rows - hidden by default */
+.edit-resolution-settings,
+.edit-shape-settings,
+.resolution-settings {
+    display: none;
+}
+
+/* End Modals & Overlays */
+
+/* ==========================================================================
+   8. Notices & Messages
+   ========================================================================== */
+.cpiu-notice {
+    padding: 10px 15px;
+    margin: 15px 0;
+    border-left: 4px solid;
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+}
+
+.cpiu-notice.cpiu-notice-success {
+    border-left-color: #46b450;
+}
+
+.cpiu-notice.cpiu-notice-error {
+    border-left-color: #dc3232;
+}
+
+.cpiu-notice.cpiu-notice-warning {
+    border-left-color: #ffb900;
+}
+
+.cpiu-notice.cpiu-notice-info {
+    border-left-color: #0073aa;
+}
+
+/* Form Validation */
+.cpiu-form .cpiu-error {
+    border-color: #dc3232 !important;
+    box-shadow: 0 0 0 1px #dc3232 !important;
+}
+
+.cpiu-form .cpiu-error-message {
+    color: #dc3232;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Tooltip Styling */
+.cpiu-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.cpiu-tooltip .cpiu-tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+}
+
+.cpiu-tooltip:hover .cpiu-tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* End Notices & Messages */
+
+/* ==========================================================================
+   9. File Upload & Progress
+   ========================================================================== */
+/* Section Tabs (for future use) */
+.cpiu-tabs {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+.cpiu-tab {
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #666;
+    border: 1px solid transparent;
+    border-bottom: none;
+    margin-bottom: -1px;
+}
+
+.cpiu-tab.active {
+    background: #fff;
+    color: #0073aa;
+    border-color: #ccc;
+}
+
+.cpiu-tab:hover {
+    color: #0073aa;
+}
+
+/* Accordion Styling (for future use) */
+.cpiu-accordion {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.cpiu-accordion-header {
+    background: #f9f9f9;
+    padding: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    font-weight: 600;
+}
+
+.cpiu-accordion-header:hover {
+    background: #f0f0f0;
+}
+
+/* End File Upload & Progress */
+
+.cpiu-accordion-content {
+    padding: 15px;
+    display: none;
+}
+
+.cpiu-accordion-content.active {
+    display: block;
+}
+
+/* Edit Modal Styles */
+.cpiu-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cpiu-modal-hidden {
+    display: none !important;
+}
+
+.cpiu-modal-content {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.cpiu-modal-header {
+    padding: 20px 20px 0 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cpiu-modal-header h3 {
+    margin: 0;
+    color: #1d2327;
+}
+
+.cpiu-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cpiu-modal-close:hover {
+    color: #000;
+}
+
+.cpiu-modal-body {
+    padding: 20px;
+}
+
+.cpiu-modal-footer {
+    padding: 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Responsive Design for Modal */
+
+
+/* Admin Form Labels */
+.cpiu-admin-form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Admin Input Fields */
+.cpiu-admin-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.4;
+    background: #fff;
+    color: #333;
+}
+
+.cpiu-admin-input:focus {
+    border-color: #0073aa;
+    box-shadow: 0 0 0 1px #0073aa;
+    outline: none;
+}
+
+/* Admin Buttons */
+.cpiu-admin-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 2px;
+    border: 1px solid #0073aa;
+    border-radius: 4px;
+    background: #0073aa;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cpiu-admin-btn:hover {
+    background: #005a87;
+    border-color: #005a87;
+    color: white;
+    text-decoration: none;
+}
+
+.cpiu-admin-btn-secondary {
+    background: #f0f0f0;
+    border-color: #ccc;
+    color: #333;
+}
+
+.cpiu-admin-btn-secondary:hover {
+    background: #e0e0e0;
+    border-color: #999;
+    color: #333;
+}
+
+/* Admin Success Messages */
+.cpiu-admin-success {
+    padding: 10px 15px;
+    margin: 10px 0;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    color: #155724;
+    font-weight: 600;
+}
+
+/* Admin Error Messages */
+.cpiu-admin-error {
+    padding: 10px 15px;
+    margin: 10px 0;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    color: #721c24;
+    font-weight: 600;
+}
+
+/* Admin Info Messages */
+.cpiu-admin-info {
+    padding: 10px 15px;
+    margin: 10px 0;
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    border-radius: 4px;
+    color: #0c5460;
+    font-weight: 600;
+}
+
+/* Admin Warning Messages */
+.cpiu-admin-warning {
+    padding: 10px 15px;
+    margin: 10px 0;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 4px;
+    color: #856404;
+    font-weight: 600;
+}
+
+/* Admin Table Styles */
+.cpiu-admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.cpiu-admin-table th,
+.cpiu-admin-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.cpiu-admin-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.cpiu-admin-table tr:hover {
+    background: #f5f5f5;
+}
+
+/* Admin Form Sections */
+.cpiu-admin-form-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cpiu-admin-form-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Admin Form Rows */
+.cpiu-admin-form-row {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.cpiu-admin-form-row label {
+    flex: 0 0 150px;
+    font-weight: 600;
+    color: #333;
+}
+
+.cpiu-admin-form-row input,
+.cpiu-admin-form-row select,
+.cpiu-admin-form-row textarea {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Admin Progress Bar */
+.cpiu-admin-progress {
+    width: 100%;
+    height: 20px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.cpiu-admin-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #0073aa, #005a87);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Admin Loading Spinner */
+.cpiu-admin-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0073aa;
+    border-radius: 50%;
+    animation: cpiu_admin_spin 1s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+@keyframes cpiu_admin_spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Admin Modal Styles */
+.cpiu-admin-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.cpiu-admin-modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.cpiu-admin-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.cpiu-admin-modal-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+/* Admin Card Styles */
+.cpiu-admin-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cpiu-admin-card-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.cpiu-admin-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.cpiu-admin-card-body {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Admin Badge Styles */
+.cpiu-admin-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cpiu-admin-badge-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.cpiu-admin-badge-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.cpiu-admin-badge-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.cpiu-admin-badge-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Admin Tooltip Styles */
+.cpiu-admin-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.cpiu-admin-tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.cpiu-admin-tooltip:hover .cpiu-admin-tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Admin List Styles */
+.cpiu-admin-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cpiu-admin-list-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cpiu-admin-list-item:last-child {
+    border-bottom: none;
+}
+
+.cpiu-admin-list-item:hover {
+    background: #f8f9fa;
+}
+
+/* Admin Checkbox and Radio Styles */
+.cpiu-admin-checkbox,
+.cpiu-admin-radio {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.cpiu-admin-checkbox-label,
+.cpiu-admin-radio-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+/* Admin Toggle Switch */
+.cpiu-admin-toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.cpiu-admin-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cpiu-admin-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.cpiu-admin-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.cpiu-admin-toggle input:checked+.cpiu-admin-toggle-slider {
+    background-color: #0073aa;
+}
+
+.cpiu-admin-toggle input:checked+.cpiu-admin-toggle-slider:before {
+    transform: translateX(26px);
+}
+
+/* Admin Responsive Design */
+
+
+/* Dimension Input Styles */
+.cpiu-dimension-input {
+    width: 80px !important;
+    margin-right: 10px;
+}
+
+.cpiu-dimension-label-spacing {
+    margin-left: 20px;
+}
+
+/* Conditional Display for Resolution Settings */
+.resolution-settings[data-show-when="resolution_validation"] {
+    display: none;
+}
+
+.resolution-settings[data-show-when="resolution_validation"].show {
+    display: table-row;
+}
+
+.cpiu-admin-modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.cpiu-admin-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.cpiu-admin-modal-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+/* Admin Card Styles */
+.cpiu-admin-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cpiu-admin-card-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.cpiu-admin-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.cpiu-admin-card-body {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Admin Badge Styles */
+.cpiu-admin-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cpiu-admin-badge-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.cpiu-admin-badge-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.cpiu-admin-badge-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.cpiu-admin-badge-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Admin Tooltip Styles */
+.cpiu-admin-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.cpiu-admin-tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.cpiu-admin-tooltip:hover .cpiu-admin-tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Admin List Styles */
+.cpiu-admin-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cpiu-admin-list-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cpiu-admin-list-item:last-child {
+    border-bottom: none;
+}
+
+.cpiu-admin-list-item:hover {
+    background: #f8f9fa;
+}
+
+/* Admin Checkbox and Radio Styles */
+.cpiu-admin-checkbox,
+.cpiu-admin-radio {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.cpiu-admin-checkbox-label,
+.cpiu-admin-radio-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+/* Admin Toggle Switch */
+.cpiu-admin-toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.cpiu-admin-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cpiu-admin-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.cpiu-admin-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.cpiu-admin-toggle input:checked+.cpiu-admin-toggle-slider {
+    background-color: #0073aa;
+}
+
+.cpiu-admin-toggle input:checked+.cpiu-admin-toggle-slider:before {
+    transform: translateX(26px);
+}
+
+/* ==========================================================================
+   Media Queries - Responsive Design
+   ========================================================================== */
+
+@media screen and (max-width: 782px) {
+    .cpiu-form .form-table th {
+        width: 100%;
+        display: block;
+        padding-bottom: 5px;
+    }
+
+    .cpiu-form .form-table td {
+        display: block;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .cpiu-product-select {
+        min-width: 100%;
+    }
+
+    .cpiu-configurations-table {
+        font-size: 12px;
+    }
+
+    .cpiu-configurations-table th,
+    .cpiu-configurations-table td {
+        padding: 8px 6px;
+    }
+
+    .cpiu-bulk-actions .button {
+        display: block;
+        margin-bottom: 5px;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .cpiu-modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+
+    .cpiu-modal-footer {
+        flex-direction: column;
+    }
+
+    .cpiu-modal-footer button {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .cpiu-admin-form-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cpiu-admin-form-row label {
+        flex: none;
+        margin-bottom: 5px;
+    }
+
+    .cpiu-admin-form-row input,
+    .cpiu-admin-form-row select,
+    .cpiu-admin-form-row textarea {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .cpiu-admin-modal-content {
+        padding: 20px;
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+
+    .cpiu-admin-table {
+        font-size: 14px;
+    }
+
+    .cpiu-admin-table th,
+    .cpiu-admin-table td {
+        padding: 8px 10px;
+    }
+}

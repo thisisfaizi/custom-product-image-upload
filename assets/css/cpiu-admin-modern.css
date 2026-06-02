@@ -1,0 +1,824 @@
+/**
+ * Custom Product Image Upload — Modern Admin Skin
+ * ------------------------------------------------
+ * Loaded AFTER cpiu-admin-styles.css. Cosmetic layer only.
+ * NEVER sets `display` on JS-driven elements (.cpiu-tab-pane, .cpiu-modal*,
+ * .resolution-settings, .edit-resolution-settings, .cpiu-accordion-content,
+ * cleanup-days row) — those visibility rules belong to the base sheet + JS.
+ *
+ * Palette: modern indigo / violet.  Style: card dashboard.
+ * PREVIEW SLICE — header, tabs, section cards, forms, buttons.
+ */
+
+.cpiu-admin-page {
+    /* Brand palette (from the product banner): plum/purple + lavender + orange CTA */
+    --cpiu-primary: #7c5aab;
+    --cpiu-primary-600: #674a8f;
+    --cpiu-primary-700: #523a72;
+    --cpiu-primary-050: #f4effb;
+    --cpiu-accent: #9b7fc9;
+    --cpiu-cta: #f59324;
+    --cpiu-cta-700: #c96a10;
+    --cpiu-cta-050: #fff5e9;
+    --cpiu-bg: #f5f1fb;
+    --cpiu-ink: #1e293b;
+    --cpiu-ink-soft: #334155;
+    --cpiu-muted: #64748b;
+    --cpiu-border: #e6e8f0;
+    --cpiu-surface: #ffffff;
+    --cpiu-success: #16a34a;
+    --cpiu-success-050: #ecfdf5;
+    --cpiu-danger: #dc2626;
+    --cpiu-danger-050: #fef2f2;
+    --cpiu-radius: 12px;
+    --cpiu-radius-sm: 8px;
+    --cpiu-radius-pill: 999px;
+    --cpiu-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 2px 8px rgba(16, 24, 40, .06);
+    --cpiu-shadow-lg: 0 12px 32px rgba(49, 46, 129, .14);
+    --cpiu-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.cpiu-admin-page {
+    max-width: none;
+    margin-right: 20px;
+    font-family: var(--cpiu-font);
+    color: var(--cpiu-ink-soft);
+}
+
+/* Kill the base sheet's square wrapper box so only the rounded card shows */
+.cpiu-admin-page .cpiu-tab-content {
+    background: transparent;
+    border: 0;
+    border-top: 0;
+    padding: 0;
+    min-height: 0;
+}
+
+/* Soft lavender page background — this admin screen only */
+body.toplevel_page_custom-image-upload-addon #wpcontent {
+    background-color: #f5f1fb;
+}
+
+/* ---- Branded header bar ---- */
+.cpiu-admin-page .cpiu-admin-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 16px 0 20px;
+    padding: 20px 24px;
+    border-radius: var(--cpiu-radius);
+    background: linear-gradient(100deg, var(--cpiu-primary-700) 0%, var(--cpiu-primary) 52%, var(--cpiu-accent) 100%);
+    box-shadow: var(--cpiu-shadow-lg);
+    color: #fff;
+}
+
+.cpiu-admin-page .cpiu-admin-header__icon {
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .16);
+    font-size: 24px;
+    line-height: 1;
+}
+
+.cpiu-admin-page .cpiu-admin-header__icon.dashicons {
+    width: 46px;
+    height: 46px;
+    font-size: 24px;
+}
+
+.cpiu-admin-page .cpiu-admin-header__titles {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.cpiu-admin-page .cpiu-admin-header h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #fff;
+}
+
+.cpiu-admin-page .cpiu-admin-header__titles p {
+    margin: 3px 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, .82);
+}
+
+.cpiu-admin-page .cpiu-admin-header__badge {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    padding: 4px 11px;
+    border-radius: var(--cpiu-radius-pill);
+    background: var(--cpiu-cta);
+    color: #3a2200;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+
+/* ---- Tab navigation (modern segmented pills) ---- */
+.cpiu-admin-page .cpiu-tab-nav.nav-tab-wrapper {
+    border: 0;
+    margin: 0 0 20px;
+    padding: 5px;
+    background: var(--cpiu-surface);
+    border-radius: var(--cpiu-radius);
+    box-shadow: var(--cpiu-shadow);
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+}
+
+.cpiu-admin-page .cpiu-tab-nav .nav-tab {
+    flex: 1 1 auto;
+    min-width: 0;
+    float: none;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    border-radius: var(--cpiu-radius-sm);
+    padding: 10px 16px;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--cpiu-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+
+.cpiu-admin-page .cpiu-tab-nav .nav-tab .dashicons {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    font-size: 17px;
+}
+
+.cpiu-admin-page .cpiu-tab-nav .nav-tab:hover,
+.cpiu-admin-page .cpiu-tab-nav .nav-tab:focus {
+    background: var(--cpiu-primary-050);
+    color: var(--cpiu-primary-700);
+    box-shadow: none;
+}
+
+.cpiu-admin-page .cpiu-tab-nav .nav-tab-active,
+.cpiu-admin-page .cpiu-tab-nav .nav-tab-active:hover,
+.cpiu-admin-page .cpiu-tab-nav .nav-tab-active:focus {
+    background: linear-gradient(180deg, var(--cpiu-primary) 0%, var(--cpiu-primary-600) 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, .35);
+}
+
+/* ---- Section cards ---- */
+.cpiu-admin-page .cpiu-section {
+    background: var(--cpiu-surface);
+    border: 1px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius);
+    box-shadow: var(--cpiu-shadow);
+    padding: 24px 26px;
+    margin: 0 0 18px;
+}
+
+.cpiu-admin-page .cpiu-section > h2 {
+    margin: 0 0 4px;
+    padding: 0;
+    border: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cpiu-ink);
+    line-height: 1.3;
+}
+
+.cpiu-admin-page .cpiu-section > p {
+    margin: 0 0 18px;
+    color: var(--cpiu-muted);
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+/* ---- Forms (WP form-table) ---- */
+.cpiu-admin-page .form-table {
+    margin-top: 4px;
+}
+
+.cpiu-admin-page .form-table > tbody > tr {
+    border-bottom: 1px solid #f1f2f7;
+}
+
+.cpiu-admin-page .form-table > tbody > tr:last-child {
+    border-bottom: 0;
+}
+
+.cpiu-admin-page .form-table th {
+    width: 250px;
+    padding: 18px 18px 18px 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--cpiu-ink);
+    vertical-align: top;
+}
+
+.cpiu-admin-page .form-table td {
+    padding: 16px 0;
+    color: var(--cpiu-ink-soft);
+}
+
+.cpiu-admin-page .description,
+.cpiu-admin-page p.description {
+    color: var(--cpiu-muted);
+    font-size: 12.5px;
+    font-style: normal;
+    line-height: 1.5;
+    margin-top: 6px;
+}
+
+.cpiu-admin-page .cpiu-info-note {
+    color: var(--cpiu-muted);
+}
+
+/* Inputs & selects */
+.cpiu-admin-page input[type="text"],
+.cpiu-admin-page input[type="number"],
+.cpiu-admin-page input[type="email"],
+.cpiu-admin-page input[type="url"],
+.cpiu-admin-page select,
+.cpiu-admin-page .regular-text,
+.cpiu-admin-page .cpiu-admin-input,
+.cpiu-admin-page .cpiu-admin-select {
+    min-height: 38px;
+    padding: 7px 11px;
+    border: 1px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius-sm);
+    background: #fff;
+    color: var(--cpiu-ink);
+    font-size: 13.5px;
+    box-shadow: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.cpiu-admin-page input[type="text"]:focus,
+.cpiu-admin-page input[type="number"]:focus,
+.cpiu-admin-page select:focus,
+.cpiu-admin-page .regular-text:focus,
+.cpiu-admin-page .cpiu-admin-input:focus,
+.cpiu-admin-page .cpiu-admin-select:focus {
+    border-color: var(--cpiu-primary);
+    box-shadow: 0 0 0 3px var(--cpiu-primary-050);
+    outline: 0;
+}
+
+.cpiu-admin-page .cpiu-dimension-input {
+    max-width: 110px;
+}
+
+/* Native <select> dropdowns — add a clear chevron affordance + field width.
+   (Excludes the Select2-powered product search, which renders its own widget.) */
+.cpiu-admin-page select:not(.cpiu-product-select) {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    min-width: 240px;
+    padding-right: 38px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    background-size: 15px 15px;
+    cursor: pointer;
+}
+
+.cpiu-admin-page select:not(.cpiu-product-select):hover {
+    border-color: var(--cpiu-primary);
+}
+
+.cpiu-admin-page select:not(.cpiu-product-select):focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23674a8f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+/* Make the Select2 product picker match the modern text inputs */
+.cpiu-admin-page .select2-container {
+    width: 100% !important;
+    max-width: 25em;
+}
+
+.cpiu-admin-page .select2-container--default .select2-selection--single {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius-sm);
+    background: #fff;
+    display: flex;
+    align-items: center;
+}
+
+.cpiu-admin-page .select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding: 0;
+    line-height: 36px;
+    color: var(--cpiu-ink);
+    font-size: 13.5px;
+}
+
+.cpiu-admin-page .select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: var(--cpiu-muted);
+}
+
+.cpiu-admin-page .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+    right: 9px;
+}
+
+.cpiu-admin-page .select2-container--default.select2-container--open .select2-selection--single,
+.cpiu-admin-page .select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: var(--cpiu-primary);
+    box-shadow: 0 0 0 3px var(--cpiu-primary-050);
+}
+
+/* Multi-select (Bulk Operations product picker) */
+.cpiu-admin-page .select2-container--default .select2-selection--multiple {
+    min-height: 38px;
+    border: 1px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius-sm);
+    background: #fff;
+}
+
+.cpiu-admin-page .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background: var(--cpiu-primary-050);
+    border: 1px solid var(--cpiu-primary);
+    color: var(--cpiu-primary-700);
+    border-radius: var(--cpiu-radius-pill);
+    padding: 2px 9px;
+    font-size: 12px;
+}
+
+/* Dropdown panel: highlighted result uses the brand color (this plugin's picker) */
+.cpiu-admin-page .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--cpiu-primary);
+}
+
+/* Tint native checkboxes/radios with the brand color for consistency */
+.cpiu-admin-page input[type="checkbox"],
+.cpiu-admin-page input[type="radio"] {
+    accent-color: var(--cpiu-primary);
+}
+
+/* Allowed-types chips — the pill IS the toggle (native checkbox hidden) */
+.cpiu-admin-page .cpiu-admin-checkbox-label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 8px 8px 0;
+    padding: 7px 16px;
+    border: 1.5px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius-pill);
+    background: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--cpiu-muted);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+
+.cpiu-admin-page .cpiu-admin-checkbox-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    pointer-events: none;
+}
+
+.cpiu-admin-page .cpiu-admin-checkbox-label:hover {
+    border-color: var(--cpiu-primary);
+    color: var(--cpiu-primary-700);
+}
+
+.cpiu-admin-page .cpiu-admin-checkbox-label:focus-within {
+    border-color: var(--cpiu-primary);
+    box-shadow: 0 0 0 3px var(--cpiu-primary-050);
+}
+
+.cpiu-admin-page .cpiu-admin-checkbox-label:has(input:checked) {
+    border-color: var(--cpiu-primary);
+    background: var(--cpiu-primary-050);
+    color: var(--cpiu-primary-700);
+}
+
+/* Leading check mark only when selected */
+.cpiu-admin-page .cpiu-admin-checkbox-label:has(input:checked)::before {
+    content: "\f147";
+    font-family: dashicons;
+    font-size: 15px;
+    line-height: 1;
+    width: 15px;
+    height: 15px;
+    margin-left: -4px;
+    color: var(--cpiu-primary);
+}
+
+/* Buttons */
+.cpiu-admin-page .button,
+.cpiu-admin-page .button-secondary {
+    border-radius: var(--cpiu-radius-sm);
+    border: 1px solid var(--cpiu-border);
+    background: #fff;
+    color: var(--cpiu-ink-soft);
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 15px;
+    height: auto;
+    line-height: 1.8;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.cpiu-admin-page .button:hover {
+    border-color: var(--cpiu-primary);
+    color: var(--cpiu-primary-700);
+    background: var(--cpiu-primary-050);
+}
+
+.cpiu-admin-page .button-primary,
+.cpiu-admin-page .button.button-primary {
+    border: 0;
+    background: linear-gradient(180deg, var(--cpiu-primary) 0%, var(--cpiu-primary-600) 100%);
+    color: #fff;
+    text-shadow: none;
+    box-shadow: 0 1px 2px rgba(79, 70, 229, .4);
+    padding: 7px 18px;
+}
+
+.cpiu-admin-page .button-primary:hover,
+.cpiu-admin-page .button.button-primary:hover {
+    background: linear-gradient(180deg, var(--cpiu-primary-600) 0%, var(--cpiu-primary-700) 100%);
+    color: #fff;
+}
+
+.cpiu-admin-page .button-link-delete,
+.cpiu-admin-page .button.button-link-delete {
+    color: var(--cpiu-danger);
+    border-color: transparent;
+    background: transparent;
+}
+
+.cpiu-admin-page .button-link-delete:hover {
+    background: var(--cpiu-danger-050);
+    border-color: var(--cpiu-danger);
+    color: var(--cpiu-danger);
+}
+
+/* Icons inside buttons inherit the button's text color (white on primary, ink on secondary) */
+.cpiu-admin-page .button .dashicons,
+.cpiu-admin-page .button-primary .dashicons,
+.cpiu-admin-page .button-secondary .dashicons,
+.cpiu-admin-page .button .cpiu-icon-spacing,
+.cpiu-admin-page .cpiu-icon-spacing {
+    color: inherit;
+    vertical-align: text-bottom;
+    line-height: inherit;
+}
+
+.cpiu-admin-page p.submit {
+    margin: 18px 0 0;
+    padding-top: 18px;
+    border-top: 1px solid #f1f2f7;
+}
+
+/* Responsive */
+/* ============================================================
+   Propagated components — table, modal, stat cards, import/export, uninstall
+   (Free + Pro tabs share these classes.)
+   ============================================================ */
+
+/* ---- Configurations table ---- */
+.cpiu-admin-page .wp-list-table {
+    border: 1px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius);
+    overflow: hidden;
+    box-shadow: var(--cpiu-shadow);
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.cpiu-admin-page .wp-list-table thead th,
+.cpiu-admin-page .wp-list-table thead td {
+    background: #faf9fe;
+    border-bottom: 1px solid var(--cpiu-border);
+    color: var(--cpiu-ink);
+    font-weight: 700;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    padding: 12px 14px;
+}
+
+.cpiu-admin-page .wp-list-table tbody td {
+    padding: 14px;
+    border-bottom: 1px solid #f1f2f7;
+    color: var(--cpiu-ink-soft);
+    vertical-align: middle;
+}
+
+.cpiu-admin-page .wp-list-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.cpiu-admin-page .wp-list-table tbody tr:hover {
+    background: #faf9fe;
+}
+
+.cpiu-admin-page .cpiu-status-enabled,
+.cpiu-admin-page .cpiu-status-disabled {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: var(--cpiu-radius-pill);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+
+.cpiu-admin-page .cpiu-status-enabled {
+    background: var(--cpiu-success-050);
+    color: var(--cpiu-success);
+}
+
+.cpiu-admin-page .cpiu-status-disabled {
+    background: #f1f5f9;
+    color: var(--cpiu-muted);
+}
+
+.cpiu-admin-page .cpiu-deleted-product {
+    color: var(--cpiu-danger);
+    font-size: 11.5px;
+    font-weight: 600;
+}
+
+/* ---- Edit modal ---- */
+.cpiu-admin-page .cpiu-modal-content {
+    border: 1px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius);
+    box-shadow: var(--cpiu-shadow-lg);
+}
+
+.cpiu-admin-page .cpiu-modal-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--cpiu-border);
+}
+
+.cpiu-admin-page .cpiu-modal-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cpiu-ink);
+}
+
+.cpiu-admin-page .cpiu-modal-close:hover {
+    color: var(--cpiu-primary);
+}
+
+.cpiu-admin-page .cpiu-modal-body {
+    padding: 22px;
+}
+
+.cpiu-admin-page .cpiu-modal-footer {
+    padding: 16px 22px;
+    border-top: 1px solid var(--cpiu-border);
+    background: #faf9fe;
+}
+
+/* ---- Security Logs stat cards (Pro) ---- */
+.cpiu-admin-page .cpiu-security-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.cpiu-admin-page .cpiu-stat-card {
+    background: #fff;
+    border: 1px solid var(--cpiu-border);
+    border-left: 4px solid var(--cpiu-primary);
+    border-radius: var(--cpiu-radius);
+    box-shadow: var(--cpiu-shadow);
+    padding: 18px;
+}
+
+.cpiu-admin-page .cpiu-stat-card.cpiu-stat-success {
+    border-left-color: var(--cpiu-success);
+}
+
+.cpiu-admin-page .cpiu-stat-card.cpiu-stat-failed {
+    border-left-color: var(--cpiu-danger);
+}
+
+.cpiu-admin-page .cpiu-stat-card.cpiu-stat-users {
+    border-left-color: var(--cpiu-cta);
+}
+
+.cpiu-admin-page .cpiu-stat-number {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--cpiu-ink);
+}
+
+.cpiu-admin-page .cpiu-stat-label {
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cpiu-muted);
+}
+
+.cpiu-admin-page .cpiu-logs-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.cpiu-admin-page .cpiu-log-status-success {
+    color: var(--cpiu-success);
+    font-weight: 700;
+    font-size: 11.5px;
+}
+
+.cpiu-admin-page .cpiu-log-status-failed {
+    color: var(--cpiu-danger);
+    font-weight: 700;
+    font-size: 11.5px;
+}
+
+/* ---- Import / Export (Pro) ---- */
+.cpiu-admin-page .cpiu-import-export-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.cpiu-admin-page .cpiu-export-section,
+.cpiu-admin-page .cpiu-import-section {
+    background: #faf9fe;
+    border: 1px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius);
+    padding: 18px 20px;
+}
+
+.cpiu-admin-page .cpiu-export-section h3,
+.cpiu-admin-page .cpiu-import-section h3 {
+    margin-top: 0;
+    font-size: 15px;
+    color: var(--cpiu-ink);
+}
+
+.cpiu-admin-page .cpiu-import-export-notice,
+.cpiu-admin-page .cpiu-data-protection-notice {
+    background: var(--cpiu-primary-050);
+    border: 1px solid #e4ddf6;
+    border-radius: var(--cpiu-radius);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--cpiu-ink-soft);
+    margin-top: 14px;
+}
+
+.cpiu-admin-page .cpiu-notice-list {
+    margin: 8px 0 0 18px;
+}
+
+.cpiu-admin-page .cpiu-notice-list li {
+    margin-bottom: 4px;
+}
+
+.cpiu-admin-page .cpiu-file-input {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+.cpiu-admin-page .cpiu-result-message {
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+/* ---- Uninstall preferences ---- */
+.cpiu-admin-page .cpiu-uninstall-warning {
+    background: var(--cpiu-cta-050);
+    border: 1px solid #f4d9b0;
+    border-radius: var(--cpiu-radius);
+    padding: 16px 20px;
+    margin-bottom: 18px;
+}
+
+.cpiu-admin-page .cpiu-warning-title {
+    margin-top: 0;
+    color: var(--cpiu-cta-700);
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cpiu-admin-page .cpiu-preference-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 14px 0;
+}
+
+.cpiu-admin-page .cpiu-preference-option {
+    display: block;
+    border: 1.5px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius);
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease;
+}
+
+.cpiu-admin-page .cpiu-preference-option:hover {
+    border-color: var(--cpiu-primary);
+    background: var(--cpiu-primary-050);
+}
+
+.cpiu-admin-page .cpiu-preference-option:has(input:checked) {
+    border-color: var(--cpiu-primary);
+    background: var(--cpiu-primary-050);
+}
+
+.cpiu-admin-page .cpiu-preference-description {
+    margin: 6px 0 0;
+    color: var(--cpiu-muted);
+    font-size: 12.5px;
+}
+
+.cpiu-admin-page .cpiu-export-before-uninstall {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--cpiu-border);
+}
+
+.cpiu-admin-page .cpiu-export-info {
+    background: #faf9fe;
+    border: 1px solid var(--cpiu-border);
+    border-radius: var(--cpiu-radius);
+    padding: 14px 18px;
+    margin-top: 12px;
+}
+
+@media screen and (max-width: 960px) {
+    .cpiu-admin-page .cpiu-tab-nav.nav-tab-wrapper {
+        flex-wrap: wrap;
+    }
+    .cpiu-admin-page .cpiu-tab-nav .nav-tab {
+        flex: 1 1 auto;
+    }
+    .cpiu-admin-page .cpiu-import-export-container,
+    .cpiu-admin-page .cpiu-preference-options {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media screen and (max-width: 782px) {
+    .cpiu-admin-page .form-table th {
+        width: auto;
+        padding-bottom: 4px;
+    }
+    .cpiu-admin-page .cpiu-section {
+        padding: 18px 16px;
+    }
+    .cpiu-admin-page .cpiu-admin-header {
+        flex-wrap: wrap;
+    }
+}
+
+/* ---- This plugin's admin notices (rendered outside .cpiu-admin-page) ---- */
+body.toplevel_page_custom-image-upload-addon #cpiu-installation-notice,
+body.toplevel_page_custom-image-upload-addon #cpiu-data-management-notice {
+    border: 1px solid #e6e8f0;
+    border-left: 4px solid #7c5aab;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 2px 8px rgba(16, 24, 40, .06);
+    padding: 4px 16px 14px;
+}
+
+body.toplevel_page_custom-image-upload-addon #cpiu-installation-notice h3,
+body.toplevel_page_custom-image-upload-addon #cpiu-data-management-notice h3 {
+    color: #1e293b;
+    font-size: 15px;
+}
+
+body.toplevel_page_custom-image-upload-addon #cpiu-installation-notice .button-primary {
+    background: linear-gradient(180deg, #7c5aab 0%, #674a8f 100%);
+    border: 0;
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(82, 58, 114, .4);
+}
