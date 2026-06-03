@@ -156,12 +156,19 @@ class CPIU_Admin_Interface
         wp_enqueue_style('wp-color-picker');
         wp_enqueue_script('wp-color-picker');
 
+        // Version the plugin's own admin assets by file modification time so
+        // edits are served immediately (no stale cached CSS/JS), while still
+        // producing a stable, cacheable version string between releases.
+        $js_ver    = $this->cpiu_asset_version('assets/js/cpiu-admin-multi-product.js');
+        $base_ver  = $this->cpiu_asset_version('assets/css/cpiu-admin-styles.css');
+        $modern_ver = $this->cpiu_asset_version('assets/css/cpiu-admin-modern.css');
+
         // Enqueue custom admin scripts
         wp_enqueue_script(
             'cpiu-admin-multi-product',
             CPIU_PLUGIN_URL . 'assets/js/cpiu-admin-multi-product.js',
             array('jquery', 'select2', 'wp-color-picker'),
-            CPIU_VERSION,
+            $js_ver,
             true
         );
 
@@ -170,7 +177,7 @@ class CPIU_Admin_Interface
             'cpiu-admin-styles',
             CPIU_PLUGIN_URL . 'assets/css/cpiu-admin-styles.css',
             array(),
-            CPIU_VERSION
+            $base_ver
         );
 
         // Modern UI skin — loaded AFTER the base sheet so it restyles cosmetics
@@ -179,7 +186,7 @@ class CPIU_Admin_Interface
             'cpiu-admin-modern',
             CPIU_PLUGIN_URL . 'assets/css/cpiu-admin-modern.css',
             array('cpiu-admin-styles'),
-            CPIU_VERSION
+            $modern_ver
         );
 
         // Localize script
@@ -217,6 +224,24 @@ class CPIU_Admin_Interface
                 'network_error_cache' => esc_html__('Network error while clearing cache.', 'custom-product-image-upload')
             )
         ));
+    }
+
+    /**
+     * Build a cache-busting version string for a bundled admin asset.
+     *
+     * Uses the file's modification time so saved edits are served immediately
+     * (no stale cached CSS/JS during development and after updates), falling
+     * back to the plugin version if the file can't be stat'd.
+     *
+     * @param string $relative_path Path relative to the plugin root.
+     * @return string Version string for wp_enqueue_*().
+     */
+    private function cpiu_asset_version($relative_path)
+    {
+        $file = CPIU_PLUGIN_PATH . $relative_path;
+        $mtime = is_readable($file) ? filemtime($file) : false;
+
+        return $mtime ? (string) $mtime : CPIU_VERSION;
     }
 
     /**
@@ -814,7 +839,7 @@ class CPIU_Admin_Interface
                                 <?php esc_html_e('Important: Data Protection Notice', 'custom-product-image-upload'); ?>
                             </h3>
                             <p class="cpiu-warning-text">
-                                <?php esc_html_e('This plugin follows WordPress and Envato marketplace standards for data handling:', 'custom-product-image-upload'); ?>
+                                <?php esc_html_e('This plugin follows WordPress best practices for data handling:', 'custom-product-image-upload'); ?>
                             </p>
                             <ul class="cpiu-warning-list">
                                 <li><strong><?php esc_html_e('Deactivation:', 'custom-product-image-upload'); ?></strong>
@@ -851,7 +876,6 @@ class CPIU_Admin_Interface
 
                             <div class="cpiu-save-preference">
                                 <button type="button" id="cpiu-save-uninstall-preference" class="button button-primary">
-                                    <span class="dashicons dashicons-saved cpiu-icon-spacing"></span>
                                     <?php esc_html_e('Save Preference', 'custom-product-image-upload'); ?>
                                 </button>
                             </div>

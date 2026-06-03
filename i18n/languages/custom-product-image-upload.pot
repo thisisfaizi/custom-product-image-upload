@@ -9,14 +9,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-02T20:11:46+00:00\n"
+"POT-Creation-Date: 2026-06-03T00:14:43+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: custom-product-image-upload\n"
 
 #. Plugin Name of the plugin
 #: custom-product-image-upload.php
-#: includes/class-cpiu-admin-interface.php:254
+#: includes/class-cpiu-admin-interface.php:279
 msgid "Custom Product Image Upload"
 msgstr ""
 
@@ -93,10 +93,10 @@ msgstr ""
 #: custom-product-image-upload.php:480
 #: custom-product-image-upload.php:490
 #: custom-product-image-upload.php:506
-#: includes/class-cpiu-admin-interface.php:1223
-#: includes/class-cpiu-admin-interface.php:1240
-#: includes/class-cpiu-admin-interface.php:1277
-#: includes/class-cpiu-admin-interface.php:1303
+#: includes/class-cpiu-admin-interface.php:1247
+#: includes/class-cpiu-admin-interface.php:1264
+#: includes/class-cpiu-admin-interface.php:1301
+#: includes/class-cpiu-admin-interface.php:1327
 #: includes/class-cpiu-ajax-handler.php:80
 #: includes/class-cpiu-ajax-handler.php:299
 #: includes/class-cpiu-ajax-handler.php:401
@@ -109,10 +109,10 @@ msgid "Security check failed."
 msgstr ""
 
 #: custom-product-image-upload.php:493
-#: includes/class-cpiu-admin-interface.php:1227
-#: includes/class-cpiu-admin-interface.php:1244
-#: includes/class-cpiu-admin-interface.php:1281
-#: includes/class-cpiu-admin-interface.php:1307
+#: includes/class-cpiu-admin-interface.php:1251
+#: includes/class-cpiu-admin-interface.php:1268
+#: includes/class-cpiu-admin-interface.php:1305
+#: includes/class-cpiu-admin-interface.php:1331
 #: includes/class-cpiu-ajax-handler.php:85
 #: includes/class-cpiu-ajax-handler.php:304
 #: includes/class-cpiu-ajax-handler.php:406
@@ -157,27 +157,27 @@ msgid "Invalid file type."
 msgstr ""
 
 #: includes/class-cpiu-admin-interface.php:65
-#: includes/class-cpiu-admin-interface.php:282
+#: includes/class-cpiu-admin-interface.php:307
 msgid "Global Settings"
 msgstr ""
 
 #: includes/class-cpiu-admin-interface.php:69
-#: includes/class-cpiu-admin-interface.php:362
+#: includes/class-cpiu-admin-interface.php:387
 msgid "Default Settings"
 msgstr ""
 
 #: includes/class-cpiu-admin-interface.php:73
-#: includes/class-cpiu-admin-interface.php:774
+#: includes/class-cpiu-admin-interface.php:799
 msgid "Add Configuration"
 msgstr ""
 
 #: includes/class-cpiu-admin-interface.php:77
-#: includes/class-cpiu-admin-interface.php:784
+#: includes/class-cpiu-admin-interface.php:809
 msgid "Existing Configurations"
 msgstr ""
 
 #: includes/class-cpiu-admin-interface.php:81
-#: includes/class-cpiu-admin-interface.php:797
+#: includes/class-cpiu-admin-interface.php:822
 msgid "Uninstall Preferences"
 msgstr ""
 
@@ -189,560 +189,560 @@ msgstr ""
 msgid "Custom Image Upload"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:198
+#: includes/class-cpiu-admin-interface.php:205
 msgid "Search products by name, ID, or SKU..."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:199
+#: includes/class-cpiu-admin-interface.php:206
 msgid "No products found."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:200
+#: includes/class-cpiu-admin-interface.php:207
 msgid "Loading..."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:201
+#: includes/class-cpiu-admin-interface.php:208
 msgid "Configuration saved successfully!"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:202
+#: includes/class-cpiu-admin-interface.php:209
 msgid "Configuration deleted successfully!"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:203
+#: includes/class-cpiu-admin-interface.php:210
 msgid "An error occurred. Please try again."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:204
+#: includes/class-cpiu-admin-interface.php:211
 msgid "Are you sure you want to delete this configuration?"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:205
+#: includes/class-cpiu-admin-interface.php:212
 msgid "Are you sure you want to delete the selected configurations?"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:206
+#: includes/class-cpiu-admin-interface.php:213
 msgid "Please select at least one product."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:207
+#: includes/class-cpiu-admin-interface.php:214
 msgid "Please fill in all required fields correctly."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:208
+#: includes/class-cpiu-admin-interface.php:215
 msgid "Settings exported successfully!"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:209
+#: includes/class-cpiu-admin-interface.php:216
 msgid "Settings imported successfully!"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:210
+#: includes/class-cpiu-admin-interface.php:217
 msgid "Please select a valid JSON file."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:211
+#: includes/class-cpiu-admin-interface.php:218
 msgid "CDN cache cleared successfully!"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:212
+#: includes/class-cpiu-admin-interface.php:219
 msgid "CDN cache refreshed successfully!"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:213
+#: includes/class-cpiu-admin-interface.php:220
 msgid "Uninstall preference saved successfully!"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:214
+#: includes/class-cpiu-admin-interface.php:221
 msgid "Network error occurred. Please try again."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:215
+#: includes/class-cpiu-admin-interface.php:222
 msgid "Please select a preference before saving."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:216
+#: includes/class-cpiu-admin-interface.php:223
 msgid "Failed to clear cache."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:217
+#: includes/class-cpiu-admin-interface.php:224
 msgid "Network error while clearing cache."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:255
+#: includes/class-cpiu-admin-interface.php:280
 msgid "Let customers upload & crop files for your WooCommerce products."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:283
+#: includes/class-cpiu-admin-interface.php:308
 msgid "Configure settings that apply globally to the entire plugin and all products."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:290
+#: includes/class-cpiu-admin-interface.php:315
 msgid "Disable Express Checkout"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:295
+#: includes/class-cpiu-admin-interface.php:320
 msgid "Hide express checkout buttons"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:298
+#: includes/class-cpiu-admin-interface.php:323
 msgid "Hide express checkout buttons (Apple Pay, Google Pay, PayPal Express, etc.) on product pages to prevent bypassing image upload."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:301
-#: includes/class-cpiu-admin-interface.php:333
+#: includes/class-cpiu-admin-interface.php:326
+#: includes/class-cpiu-admin-interface.php:358
 msgid "Note:"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:302
+#: includes/class-cpiu-admin-interface.php:327
 msgid "This setting applies universally to all products where this plugin is active."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:308
+#: includes/class-cpiu-admin-interface.php:333
 msgid "Auto-Cleanup Order Images"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:313
+#: includes/class-cpiu-admin-interface.php:338
 msgid "Automatically delete uploaded images from completed orders"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:316
+#: includes/class-cpiu-admin-interface.php:341
 msgid "When enabled, uploaded images attached to completed, cancelled, or refunded orders will be automatically deleted after the specified number of days. Images from pending, processing, or on-hold orders will not be affected."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:323
+#: includes/class-cpiu-admin-interface.php:348
 msgid "Cleanup After (Days)"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:330
+#: includes/class-cpiu-admin-interface.php:355
 msgid "Number of days after order completion before images are deleted (1–365). Default: 30 days."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:334
+#: includes/class-cpiu-admin-interface.php:359
 msgid "The cleanup runs automatically once daily via WordPress cron."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:352
+#: includes/class-cpiu-admin-interface.php:377
 msgid "Save Global Settings"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:363
+#: includes/class-cpiu-admin-interface.php:388
 msgid "Configure default settings that will be used as fallback for products without specific configurations."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:371
+#: includes/class-cpiu-admin-interface.php:396
 msgid "Default Required Files"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:378
+#: includes/class-cpiu-admin-interface.php:403
 msgid "Default number of files required for products."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:385
+#: includes/class-cpiu-admin-interface.php:410
 msgid "Default Max File Size (MB)"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:392
+#: includes/class-cpiu-admin-interface.php:417
 msgid "Default maximum file size in megabytes."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:399
+#: includes/class-cpiu-admin-interface.php:424
 msgid "Default Button Text"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:406
+#: includes/class-cpiu-admin-interface.php:431
 msgid "Default text for the upload button."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:413
+#: includes/class-cpiu-admin-interface.php:438
 msgid "Default Button Color"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:420
+#: includes/class-cpiu-admin-interface.php:445
 msgid "Default color for progress bars and buttons."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:427
+#: includes/class-cpiu-admin-interface.php:452
 msgid "Default Allowed File Types"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:443
+#: includes/class-cpiu-admin-interface.php:468
 msgid "Default allowed file types for products."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:449
-#: includes/class-cpiu-admin-interface.php:663
-#: includes/class-cpiu-admin-interface.php:1088
+#: includes/class-cpiu-admin-interface.php:474
+#: includes/class-cpiu-admin-interface.php:688
+#: includes/class-cpiu-admin-interface.php:1112
 msgid "Resolution Validation"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:454
-#: includes/class-cpiu-admin-interface.php:668
-#: includes/class-cpiu-admin-interface.php:1094
+#: includes/class-cpiu-admin-interface.php:479
+#: includes/class-cpiu-admin-interface.php:693
+#: includes/class-cpiu-admin-interface.php:1118
 msgid "Enable resolution validation for uploaded images"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:457
-#: includes/class-cpiu-admin-interface.php:671
-#: includes/class-cpiu-admin-interface.php:1097
+#: includes/class-cpiu-admin-interface.php:482
+#: includes/class-cpiu-admin-interface.php:696
+#: includes/class-cpiu-admin-interface.php:1121
 msgid "When enabled, uploaded images must meet minimum and maximum dimension requirements."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:463
-#: includes/class-cpiu-admin-interface.php:677
-#: includes/class-cpiu-admin-interface.php:1103
+#: includes/class-cpiu-admin-interface.php:488
+#: includes/class-cpiu-admin-interface.php:702
+#: includes/class-cpiu-admin-interface.php:1127
 msgid "Minimum Dimensions"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:467
-#: includes/class-cpiu-admin-interface.php:491
-#: includes/class-cpiu-admin-interface.php:681
-#: includes/class-cpiu-admin-interface.php:705
-#: includes/class-cpiu-admin-interface.php:1107
-#: includes/class-cpiu-admin-interface.php:1129
+#: includes/class-cpiu-admin-interface.php:492
+#: includes/class-cpiu-admin-interface.php:516
+#: includes/class-cpiu-admin-interface.php:706
+#: includes/class-cpiu-admin-interface.php:730
+#: includes/class-cpiu-admin-interface.php:1131
+#: includes/class-cpiu-admin-interface.php:1153
 msgid "Width:"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:474
-#: includes/class-cpiu-admin-interface.php:498
-#: includes/class-cpiu-admin-interface.php:688
-#: includes/class-cpiu-admin-interface.php:712
-#: includes/class-cpiu-admin-interface.php:1113
-#: includes/class-cpiu-admin-interface.php:1135
+#: includes/class-cpiu-admin-interface.php:499
+#: includes/class-cpiu-admin-interface.php:523
+#: includes/class-cpiu-admin-interface.php:713
+#: includes/class-cpiu-admin-interface.php:737
+#: includes/class-cpiu-admin-interface.php:1137
+#: includes/class-cpiu-admin-interface.php:1159
 msgid "Height:"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:481
-#: includes/class-cpiu-admin-interface.php:695
-#: includes/class-cpiu-admin-interface.php:1119
+#: includes/class-cpiu-admin-interface.php:506
+#: includes/class-cpiu-admin-interface.php:720
+#: includes/class-cpiu-admin-interface.php:1143
 msgid "Minimum required dimensions (0 = no minimum)."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:487
-#: includes/class-cpiu-admin-interface.php:701
-#: includes/class-cpiu-admin-interface.php:1125
+#: includes/class-cpiu-admin-interface.php:512
+#: includes/class-cpiu-admin-interface.php:726
+#: includes/class-cpiu-admin-interface.php:1149
 msgid "Maximum Dimensions"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:505
-#: includes/class-cpiu-admin-interface.php:719
-#: includes/class-cpiu-admin-interface.php:1141
+#: includes/class-cpiu-admin-interface.php:530
+#: includes/class-cpiu-admin-interface.php:744
+#: includes/class-cpiu-admin-interface.php:1165
 msgid "Maximum allowed dimensions (0 = no maximum)."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:511
-#: includes/class-cpiu-admin-interface.php:725
-#: includes/class-cpiu-admin-interface.php:1147
+#: includes/class-cpiu-admin-interface.php:536
+#: includes/class-cpiu-admin-interface.php:750
+#: includes/class-cpiu-admin-interface.php:1171
 msgid "Shape Cropping"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:516
-#: includes/class-cpiu-admin-interface.php:730
-#: includes/class-cpiu-admin-interface.php:1153
+#: includes/class-cpiu-admin-interface.php:541
+#: includes/class-cpiu-admin-interface.php:755
+#: includes/class-cpiu-admin-interface.php:1177
 msgid "Enable shape cropping options"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:519
-#: includes/class-cpiu-admin-interface.php:733
-#: includes/class-cpiu-admin-interface.php:1156
+#: includes/class-cpiu-admin-interface.php:544
+#: includes/class-cpiu-admin-interface.php:758
+#: includes/class-cpiu-admin-interface.php:1180
 msgid "Allow users to crop images using shape presets."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:525
-#: includes/class-cpiu-admin-interface.php:739
-#: includes/class-cpiu-admin-interface.php:1162
+#: includes/class-cpiu-admin-interface.php:550
+#: includes/class-cpiu-admin-interface.php:764
+#: includes/class-cpiu-admin-interface.php:1186
 msgid "Cropping Ratio"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:529
-#: includes/class-cpiu-admin-interface.php:743
-#: includes/class-cpiu-admin-interface.php:1167
+#: includes/class-cpiu-admin-interface.php:554
+#: includes/class-cpiu-admin-interface.php:768
+#: includes/class-cpiu-admin-interface.php:1191
 msgid "Free (No restrictions)"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:532
-#: includes/class-cpiu-admin-interface.php:746
-#: includes/class-cpiu-admin-interface.php:1169
+#: includes/class-cpiu-admin-interface.php:557
+#: includes/class-cpiu-admin-interface.php:771
+#: includes/class-cpiu-admin-interface.php:1193
 msgid "Square (1:1)"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:535
-#: includes/class-cpiu-admin-interface.php:749
-#: includes/class-cpiu-admin-interface.php:1171
+#: includes/class-cpiu-admin-interface.php:560
+#: includes/class-cpiu-admin-interface.php:774
+#: includes/class-cpiu-admin-interface.php:1195
 msgid "4:3"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:537
-#: includes/class-cpiu-admin-interface.php:751
-#: includes/class-cpiu-admin-interface.php:1172
+#: includes/class-cpiu-admin-interface.php:562
+#: includes/class-cpiu-admin-interface.php:776
+#: includes/class-cpiu-admin-interface.php:1196
 msgid "16:9"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:539
-#: includes/class-cpiu-admin-interface.php:753
-#: includes/class-cpiu-admin-interface.php:1174
+#: includes/class-cpiu-admin-interface.php:564
+#: includes/class-cpiu-admin-interface.php:778
+#: includes/class-cpiu-admin-interface.php:1198
 msgid "2:3"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:543
-#: includes/class-cpiu-admin-interface.php:757
-#: includes/class-cpiu-admin-interface.php:1177
+#: includes/class-cpiu-admin-interface.php:568
+#: includes/class-cpiu-admin-interface.php:782
+#: includes/class-cpiu-admin-interface.php:1201
 msgid "Force a specific aspect ratio for cropping."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:550
+#: includes/class-cpiu-admin-interface.php:575
 msgid "Save Default Settings"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:560
+#: includes/class-cpiu-admin-interface.php:585
 msgid "Add Product Configuration"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:561
+#: includes/class-cpiu-admin-interface.php:586
 msgid "Configure image upload settings for individual products."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:569
+#: includes/class-cpiu-admin-interface.php:594
 msgid "Select Product"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:575
+#: includes/class-cpiu-admin-interface.php:600
 msgid "Search for a product..."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:579
+#: includes/class-cpiu-admin-interface.php:604
 msgid "Start typing to search for products by name or ID."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:586
-#: includes/class-cpiu-admin-interface.php:1015
+#: includes/class-cpiu-admin-interface.php:611
+#: includes/class-cpiu-admin-interface.php:1039
 msgid "Required Files"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:593
-#: includes/class-cpiu-admin-interface.php:1021
+#: includes/class-cpiu-admin-interface.php:618
+#: includes/class-cpiu-admin-interface.php:1045
 msgid "Number of files required for this product."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:600
-#: includes/class-cpiu-admin-interface.php:1028
+#: includes/class-cpiu-admin-interface.php:625
+#: includes/class-cpiu-admin-interface.php:1052
 msgid "Max File Size (MB)"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:607
-#: includes/class-cpiu-admin-interface.php:1034
+#: includes/class-cpiu-admin-interface.php:632
+#: includes/class-cpiu-admin-interface.php:1058
 msgid "Maximum file size in megabytes."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:614
-#: includes/class-cpiu-admin-interface.php:1041
+#: includes/class-cpiu-admin-interface.php:639
+#: includes/class-cpiu-admin-interface.php:1065
 msgid "Button Text"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:621
-#: includes/class-cpiu-admin-interface.php:1046
+#: includes/class-cpiu-admin-interface.php:646
+#: includes/class-cpiu-admin-interface.php:1070
 msgid "Text for the upload button (leave empty to use default)."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:628
-#: includes/class-cpiu-admin-interface.php:1053
+#: includes/class-cpiu-admin-interface.php:653
+#: includes/class-cpiu-admin-interface.php:1077
 msgid "Button Color"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:635
-#: includes/class-cpiu-admin-interface.php:1058
+#: includes/class-cpiu-admin-interface.php:660
+#: includes/class-cpiu-admin-interface.php:1082
 msgid "Color for progress bars and buttons (leave empty to use default)."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:641
-#: includes/class-cpiu-admin-interface.php:1064
+#: includes/class-cpiu-admin-interface.php:666
+#: includes/class-cpiu-admin-interface.php:1088
 msgid "Allowed File Types"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:657
-#: includes/class-cpiu-admin-interface.php:1082
+#: includes/class-cpiu-admin-interface.php:682
+#: includes/class-cpiu-admin-interface.php:1106
 msgid "Allowed file types for this product."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:785
+#: includes/class-cpiu-admin-interface.php:810
 msgid "Manage existing product configurations."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:798
+#: includes/class-cpiu-admin-interface.php:823
 msgid "Configure what happens to your data when the plugin is uninstalled."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:814
+#: includes/class-cpiu-admin-interface.php:839
 msgid "Important: Data Protection Notice"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:817
-msgid "This plugin follows WordPress and Envato marketplace standards for data handling:"
-msgstr ""
-
-#: includes/class-cpiu-admin-interface.php:820
-msgid "Deactivation:"
-msgstr ""
-
-#: includes/class-cpiu-admin-interface.php:821
-msgid "No data is deleted when you deactivate the plugin. All settings and uploaded images are preserved."
-msgstr ""
-
-#: includes/class-cpiu-admin-interface.php:823
-msgid "Uninstallation:"
-msgstr ""
-
-#: includes/class-cpiu-admin-interface.php:824
-msgid "You can choose whether to keep or delete your data during uninstallation."
-msgstr ""
-
-#: includes/class-cpiu-admin-interface.php:830
-msgid "Uninstall Data Preference"
-msgstr ""
-
-#: includes/class-cpiu-admin-interface.php:831
-msgid "Choose what should happen to your plugin data when you uninstall the plugin:"
-msgstr ""
-
-#: includes/class-cpiu-admin-interface.php:837
-msgid "Keep all data (Recommended)"
-msgstr ""
-
-#: includes/class-cpiu-admin-interface.php:839
-msgid "Preserve all settings, configurations, and uploaded images. You can reinstall the plugin later without losing any data."
+#: includes/class-cpiu-admin-interface.php:842
+msgid "This plugin follows WordPress best practices for data handling:"
 msgstr ""
 
 #: includes/class-cpiu-admin-interface.php:845
-msgid "Delete all data"
+msgid "Deactivation:"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:847
-msgid "Remove all plugin settings and configurations. Note: Uploaded images referenced in orders will be preserved for data integrity."
+#: includes/class-cpiu-admin-interface.php:846
+msgid "No data is deleted when you deactivate the plugin. All settings and uploaded images are preserved."
+msgstr ""
+
+#: includes/class-cpiu-admin-interface.php:848
+msgid "Uninstallation:"
+msgstr ""
+
+#: includes/class-cpiu-admin-interface.php:849
+msgid "You can choose whether to keep or delete your data during uninstallation."
 msgstr ""
 
 #: includes/class-cpiu-admin-interface.php:855
-msgid "Save Preference"
+msgid "Uninstall Data Preference"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:861
-msgid "Export Settings Before Uninstall"
+#: includes/class-cpiu-admin-interface.php:856
+msgid "Choose what should happen to your plugin data when you uninstall the plugin:"
 msgstr ""
 
 #: includes/class-cpiu-admin-interface.php:862
-msgid "Before uninstalling, you can export your settings to a backup file. This allows you to restore your configuration if you reinstall the plugin later."
+msgid "Keep all data (Recommended)"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:868
-msgid "Export Settings Backup"
+#: includes/class-cpiu-admin-interface.php:864
+msgid "Preserve all settings, configurations, and uploaded images. You can reinstall the plugin later without losing any data."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:874
-msgid "What gets exported:"
+#: includes/class-cpiu-admin-interface.php:870
+msgid "Delete all data"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:877
-msgid "All plugin settings and configurations"
+#: includes/class-cpiu-admin-interface.php:872
+msgid "Remove all plugin settings and configurations. Note: Uploaded images referenced in orders will be preserved for data integrity."
 msgstr ""
 
 #: includes/class-cpiu-admin-interface.php:879
+msgid "Save Preference"
+msgstr ""
+
+#: includes/class-cpiu-admin-interface.php:885
+msgid "Export Settings Before Uninstall"
+msgstr ""
+
+#: includes/class-cpiu-admin-interface.php:886
+msgid "Before uninstalling, you can export your settings to a backup file. This allows you to restore your configuration if you reinstall the plugin later."
+msgstr ""
+
+#: includes/class-cpiu-admin-interface.php:892
+msgid "Export Settings Backup"
+msgstr ""
+
+#: includes/class-cpiu-admin-interface.php:898
+msgid "What gets exported:"
+msgstr ""
+
+#: includes/class-cpiu-admin-interface.php:901
+msgid "All plugin settings and configurations"
+msgstr ""
+
+#: includes/class-cpiu-admin-interface.php:903
 msgid "Product-specific image upload configurations"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:881
+#: includes/class-cpiu-admin-interface.php:905
 msgid "Default settings and preferences"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:883
+#: includes/class-cpiu-admin-interface.php:907
 msgid "Export timestamp and plugin version"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:887
+#: includes/class-cpiu-admin-interface.php:911
 msgid "Note: Uploaded images are not included in the export. Only configuration settings are backed up."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:921
+#: includes/class-cpiu-admin-interface.php:945
 msgid "No product configurations found."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:928
+#: includes/class-cpiu-admin-interface.php:952
 msgid "Product ID"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:929
-#: includes/class-cpiu-admin-interface.php:1003
+#: includes/class-cpiu-admin-interface.php:953
+#: includes/class-cpiu-admin-interface.php:1027
 msgid "Product"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:930
+#: includes/class-cpiu-admin-interface.php:954
 msgid "Images Required"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:932
+#: includes/class-cpiu-admin-interface.php:956
 msgid "Max File Size"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:934
+#: includes/class-cpiu-admin-interface.php:958
 msgid "Allowed Types"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:936
-#: includes/class-cpiu-admin-interface.php:1185
+#: includes/class-cpiu-admin-interface.php:960
+#: includes/class-cpiu-admin-interface.php:1209
 msgid "Status"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:937
+#: includes/class-cpiu-admin-interface.php:961
 msgid "Actions"
 msgstr ""
 
 #. translators: %1$d: Product ID
-#: includes/class-cpiu-admin-interface.php:945
-#: includes/class-cpiu-admin-interface.php:1262
+#: includes/class-cpiu-admin-interface.php:969
+#: includes/class-cpiu-admin-interface.php:1286
 #, php-format
 msgid "Product #%1$d (deleted)"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:956
+#: includes/class-cpiu-admin-interface.php:980
 msgid "(Product deleted)"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:965
+#: includes/class-cpiu-admin-interface.php:989
 msgid "Enabled"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:969
+#: includes/class-cpiu-admin-interface.php:993
 msgid "Disabled"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:976
+#: includes/class-cpiu-admin-interface.php:1000
 msgid "Edit"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:980
+#: includes/class-cpiu-admin-interface.php:1004
 msgid "Delete"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:993
+#: includes/class-cpiu-admin-interface.php:1017
 msgid "Edit Configuration"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1007
+#: includes/class-cpiu-admin-interface.php:1031
 msgid "Product ID:"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1190
+#: includes/class-cpiu-admin-interface.php:1214
 msgid "Enable image upload for this product"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1208
+#: includes/class-cpiu-admin-interface.php:1232
 msgid "Save Changes"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1210
+#: includes/class-cpiu-admin-interface.php:1234
 #: includes/class-cpiu-frontend-manager.php:505
 msgid "Cancel"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1250
+#: includes/class-cpiu-admin-interface.php:1274
 #: includes/class-cpiu-ajax-handler.php:367
 #: includes/class-cpiu-ajax-handler.php:412
 #: includes/class-cpiu-ajax-handler.php:578
@@ -751,27 +751,27 @@ msgstr ""
 msgid "Invalid product ID."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1256
+#: includes/class-cpiu-admin-interface.php:1280
 msgid "Configuration not found."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1288
+#: includes/class-cpiu-admin-interface.php:1312
 msgid "Data will be preserved during uninstallation."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1291
+#: includes/class-cpiu-admin-interface.php:1315
 msgid "Data will be deleted during uninstallation."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1293
+#: includes/class-cpiu-admin-interface.php:1317
 msgid "Invalid preference."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1325
+#: includes/class-cpiu-admin-interface.php:1349
 msgid "Settings exported successfully for backup before uninstall."
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1336
+#: includes/class-cpiu-admin-interface.php:1360
 #: includes/class-cpiu-frontend-manager.php:300
 #: includes/class-cpiu-frontend-manager.php:816
 #: includes/class-cpiu-frontend-manager.php:850
@@ -779,15 +779,15 @@ msgstr ""
 msgid "Uploaded files"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1354
+#: includes/class-cpiu-admin-interface.php:1378
 msgid "Uploaded files:"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1391
+#: includes/class-cpiu-admin-interface.php:1415
 msgid "Uploaded file"
 msgstr ""
 
-#: includes/class-cpiu-admin-interface.php:1398
+#: includes/class-cpiu-admin-interface.php:1422
 msgid "Download file"
 msgstr ""
 

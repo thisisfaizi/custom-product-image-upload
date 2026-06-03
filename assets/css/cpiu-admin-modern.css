@@ -60,6 +60,9 @@ body.toplevel_page_custom-image-upload-addon #wpcontent {
 }
 
 /* ---- Branded header bar ---- */
+/* Layered background: a subtle Hero Patterns "Diagonal Lines" texture (inline
+   SVG data-URI, white at low opacity) sits over a soft top-left highlight and
+   the brand gradient — adds a premium, tactile feel without an HTTP request. */
 .cpiu-admin-page .cpiu-admin-header {
     display: flex;
     align-items: center;
@@ -67,7 +70,11 @@ body.toplevel_page_custom-image-upload-addon #wpcontent {
     margin: 16px 0 20px;
     padding: 20px 24px;
     border-radius: var(--cpiu-radius);
-    background: linear-gradient(100deg, var(--cpiu-primary-700) 0%, var(--cpiu-primary) 52%, var(--cpiu-accent) 100%);
+    background-color: var(--cpiu-primary);
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40' fill='%23ffffff' fill-opacity='0.06' fill-rule='evenodd'/%3E%3C/svg%3E"),
+        radial-gradient(120% 140% at 0% 0%, rgba(255, 255, 255, .14) 0%, rgba(255, 255, 255, 0) 42%),
+        linear-gradient(100deg, var(--cpiu-primary-700) 0%, var(--cpiu-primary) 52%, var(--cpiu-accent) 100%);
     box-shadow: var(--cpiu-shadow-lg);
     color: #fff;
 }
@@ -454,7 +461,7 @@ body.toplevel_page_custom-image-upload-addon #wpcontent {
     background: linear-gradient(180deg, var(--cpiu-primary) 0%, var(--cpiu-primary-600) 100%);
     color: #fff;
     text-shadow: none;
-    box-shadow: 0 1px 2px rgba(79, 70, 229, .4);
+    box-shadow: 0 1px 2px rgba(82, 58, 114, .4);
     padding: 7px 18px;
 }
 
@@ -486,6 +493,19 @@ body.toplevel_page_custom-image-upload-addon #wpcontent {
     color: inherit;
     vertical-align: text-bottom;
     line-height: inherit;
+}
+
+/* Primary buttons are white-on-purple: force the icon to crisp, pure white and
+   use grayscale antialiasing so thin glyph strokes don't pick up a colored
+   (lavender/blue) subpixel fringe on the gradient. */
+.cpiu-admin-page .button-primary .dashicons,
+.cpiu-admin-page .button.button-primary .dashicons,
+.cpiu-admin-page .button-primary .cpiu-icon-spacing,
+.cpiu-admin-page .button.button-primary .cpiu-icon-spacing {
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 .cpiu-admin-page p.submit {
