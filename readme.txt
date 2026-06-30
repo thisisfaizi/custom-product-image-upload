@@ -1,7 +1,7 @@
 === Custom Product Image Upload ===
 Contributors: nowdigiverse
 Tags: woocommerce, image upload, product customization, cropping, file upload
-Requires at least: 5.2
+Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.2
 Stable tag: 1.0.0

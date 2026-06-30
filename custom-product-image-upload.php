@@ -10,7 +10,7 @@
  * License URI:    https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:    custom-product-image-upload
  * Domain Path:    /i18n/languages
- * Requires at least: 5.2
+ * Requires at least: 5.9
  * Requires PHP:   7.2
  * WC requires at least: 3.5
  * WC tested up to:   9.5
