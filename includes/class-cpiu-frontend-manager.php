@@ -319,7 +319,7 @@ class CPIU_Frontend_Manager
     public function enqueue_blocks_assets()
     {
         // Ensure our assets are loaded on block themes
-        if (function_exists('wp_is_block_theme') && wp_is_block_theme()) {
+        if (function_exists('wp_is_block_theme') && call_user_func('wp_is_block_theme')) {
             $this->enqueue_frontend_scripts();
         }
     }
