@@ -17,6 +17,30 @@ class CPIU_Data_Manager
 {
 
     /**
+     * Shared instance.
+     *
+     * @var CPIU_Data_Manager|null
+     */
+    private static $instance = null;
+
+    /**
+     * Get the shared instance.
+     *
+     * The Data Manager registers hooks and settings in its constructor/init,
+     * so all consumers must share one instance to avoid duplicate
+     * registrations (e.g. the option sanitize callbacks running repeatedly).
+     *
+     * @return CPIU_Data_Manager
+     */
+    public static function instance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    /**
      * Option name for storing multi-product configurations
      */
     const MULTI_PRODUCT_OPTION = 'cpiu_multi_product_configs';
@@ -100,6 +124,172 @@ class CPIU_Data_Manager
     {
         // Initialize cache
         wp_cache_add_non_persistent_groups(self::CACHE_GROUP);
+
+        // Formally declare the plugin's options. The sanitize callbacks make the
+        // Data Manager the single source of truth: they run on every
+        // add_option()/update_option() regardless of which code path saves.
+        register_setting('cpiu_settings_group', self::MULTI_PRODUCT_OPTION, array(
+            'type' => 'array',
+            'sanitize_callback' => array($this, 'sanitize_all_configurations'),
+            'default' => array(),
+        ));
+        register_setting('cpiu_settings_group', self::DEFAULT_SETTINGS_OPTION, array(
+            'type' => 'array',
+            'sanitize_callback' => array($this, 'sanitize_default_settings'),
+            'default' => $this->default_settings,
+        ));
+        register_setting('cpiu_settings_group', self::GLOBAL_SETTINGS_OPTION, array(
+            'type' => 'array',
+            'sanitize_callback' => array($this, 'sanitize_global_settings'),
+            'default' => $this->default_global_settings,
+        ));
+    }
+
+    /**
+     * Sanitize a list of file extensions against the supported whitelist.
+     *
+     * @param mixed $types Raw list of extensions.
+     * @return array Sanitized, lowercased extensions (never empty).
+     */
+    public function sanitize_allowed_types($types)
+    {
+        $sanitized = array();
+
+        if (is_array($types)) {
+            $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf');
+            foreach ($types as $type) {
+                $type = strtolower(sanitize_text_field($type));
+                if (in_array($type, $allowed_extensions, true)) {
+                    $sanitized[] = $type;
+                }
+            }
+        }
+
+        // Ensure at least one type is allowed
+        if (empty($sanitized)) {
+            $sanitized = array('jpg', 'jpeg', 'png');
+        }
+
+        return array_values(array_unique($sanitized));
+    }
+
+    /**
+     * Sanitize a cropping ratio value.
+     *
+     * @param mixed $ratio Raw ratio value.
+     * @return string One of the supported ratio strings.
+     */
+    public function sanitize_cropping_ratio($ratio)
+    {
+        $allowed_ratios = array('free', '1:1', '4:3', '16:9', '2:3');
+        return in_array($ratio, $allowed_ratios, true) ? $ratio : 'free';
+    }
+
+    /**
+     * Sanitize the default settings option.
+     *
+     * Single source of truth for 'cpiu_default_settings' — used by the AJAX
+     * save path and registered as the option's sanitize callback.
+     *
+     * @param mixed $settings Raw settings.
+     * @return array Sanitized settings.
+     */
+    public function sanitize_default_settings($settings)
+    {
+        $raw = is_array($settings) ? $settings : array();
+
+        $sanitized = array(
+            'image_count' => max(1, min(50, absint($raw['image_count'] ?? $this->default_settings['image_count']))),
+            'max_file_size' => max(1024, absint($raw['max_file_size'] ?? $this->default_settings['max_file_size'])),
+            'button_text' => sanitize_text_field($raw['button_text'] ?? $this->default_settings['button_text']),
+            'button_color' => sanitize_hex_color($raw['button_color'] ?? '') ?: $this->default_settings['button_color'],
+            'resolution_validation' => !empty($raw['resolution_validation']),
+            'min_width' => max(0, min(10000, absint($raw['min_width'] ?? 0))),
+            'min_height' => max(0, min(10000, absint($raw['min_height'] ?? 0))),
+            'max_width' => max(0, min(10000, absint($raw['max_width'] ?? 0))),
+            'max_height' => max(0, min(10000, absint($raw['max_height'] ?? 0))),
+            'enable_shape_cropping' => isset($raw['enable_shape_cropping']) ? (bool) $raw['enable_shape_cropping'] : true,
+            'cropping_ratio' => $this->sanitize_cropping_ratio($raw['cropping_ratio'] ?? 'free'),
+            'allowed_types' => $this->sanitize_allowed_types($raw['allowed_types'] ?? array()),
+        );
+
+        return wp_parse_args($sanitized, $this->default_settings);
+    }
+
+    /**
+     * Sanitize the global settings option.
+     *
+     * Single source of truth for 'cpiu_global_settings' — used by the AJAX
+     * save path and registered as the option's sanitize callback.
+     *
+     * @param mixed $settings Raw settings.
+     * @return array Sanitized settings.
+     */
+    public function sanitize_global_settings($settings)
+    {
+        $raw = is_array($settings) ? $settings : array();
+
+        $sanitized = array(
+            'disable_express_checkout' => !empty($raw['disable_express_checkout']),
+            'enable_order_image_cleanup' => !empty($raw['enable_order_image_cleanup']),
+            'order_image_cleanup_days' => isset($raw['order_image_cleanup_days'])
+                ? max(1, min(365, absint($raw['order_image_cleanup_days'])))
+                : $this->default_global_settings['order_image_cleanup_days'],
+        );
+
+        /**
+         * Filters sanitized global settings before they are saved.
+         *
+         * Add-ons (e.g. the Pro Elementor integration) hook this to sanitize and
+         * persist their own fields rendered via the `cpiu_global_settings_fields` action.
+         * Implementations must be idempotent — the filter may run more than once
+         * on the same data (AJAX save + option sanitize callback).
+         *
+         * @param array $sanitized Settings about to be saved.
+         * @param array $raw       Raw settings as submitted.
+         */
+        return apply_filters('cpiu_save_global_settings', $sanitized, $raw);
+    }
+
+    /**
+     * Sanitize the full per-product configurations option.
+     *
+     * Registered as the sanitize callback for 'cpiu_multi_product_configs'.
+     *
+     * @param mixed $configs Raw configurations keyed by product ID.
+     * @return array Sanitized configurations.
+     */
+    public function sanitize_all_configurations($configs)
+    {
+        if (!is_array($configs)) {
+            return array();
+        }
+
+        $sanitized = array();
+        foreach ($configs as $product_id => $config) {
+            if (!is_array($config)) {
+                continue;
+            }
+
+            $product_id = absint($product_id);
+            if ($product_id <= 0) {
+                continue;
+            }
+
+            $config = wp_parse_args($config, $this->default_config);
+            $config['product_id'] = $product_id;
+
+            $clean = $this->sanitize_configuration($config);
+
+            // Preserve timestamps — sanitize_configuration() rebuilds the array
+            // from scratch and would otherwise reset them.
+            $clean['created_at'] = isset($config['created_at']) ? sanitize_text_field($config['created_at']) : '';
+            $clean['updated_at'] = isset($config['updated_at']) ? sanitize_text_field($config['updated_at']) : '';
+
+            $sanitized[$product_id] = $clean;
+        }
+
+        return $sanitized;
     }
 
     /**
@@ -496,32 +686,18 @@ class CPIU_Data_Manager
     {
         $sanitized = array();
 
-        $sanitized['product_id'] = absint($config['product_id']);
-        $sanitized['image_count'] = max(1, min(50, absint($config['image_count'])));
-        $sanitized['max_file_size'] = max(1024, absint($config['max_file_size']));
-        $sanitized['button_text'] = sanitize_text_field($config['button_text']);
-        $sanitized['button_color'] = sanitize_hex_color($config['button_color']);
+        $sanitized['product_id'] = absint($config['product_id'] ?? 0);
+        $sanitized['image_count'] = max(1, min(50, absint($config['image_count'] ?? $this->default_config['image_count'])));
+        $sanitized['max_file_size'] = max(1024, absint($config['max_file_size'] ?? $this->default_config['max_file_size']));
+        $sanitized['button_text'] = sanitize_text_field($config['button_text'] ?? '');
+        $sanitized['button_color'] = sanitize_hex_color($config['button_color'] ?? '');
         // If 'enabled' not provided, default to true
         if (array_key_exists('enabled', $config)) {
             $sanitized['enabled'] = !empty($config['enabled']);
         }
 
-        // Sanitize allowed types
-        $sanitized['allowed_types'] = array();
-        if (is_array($config['allowed_types'])) {
-            $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf');
-            foreach ($config['allowed_types'] as $type) {
-                $type = sanitize_text_field($type);
-                if (in_array(strtolower($type), $allowed_extensions)) {
-                    $sanitized['allowed_types'][] = strtolower($type);
-                }
-            }
-        }
-
-        // Ensure at least one type is allowed
-        if (empty($sanitized['allowed_types'])) {
-            $sanitized['allowed_types'] = array('jpg', 'jpeg', 'png');
-        }
+        // Sanitize allowed types (shared whitelist helper, never empty)
+        $sanitized['allowed_types'] = $this->sanitize_allowed_types($config['allowed_types'] ?? array());
 
         // Sanitize resolution validation settings
         $sanitized['resolution_validation'] = !empty($config['resolution_validation']);
@@ -533,13 +709,8 @@ class CPIU_Data_Manager
         // Sanitize Enable Shape Cropping
         $sanitized['enable_shape_cropping'] = isset($config['enable_shape_cropping']) ? (bool) $config['enable_shape_cropping'] : true;
 
-        // Sanitize Cropping Ratio
-        $allowed_ratios = array('free', '1:1', '4:3', '16:9', '2:3');
-        $sanitized['cropping_ratio'] = isset($config['cropping_ratio']) && in_array($config['cropping_ratio'], $allowed_ratios)
-            ? $config['cropping_ratio']
-            : 'free';
-
-
+        // Sanitize Cropping Ratio (shared helper)
+        $sanitized['cropping_ratio'] = $this->sanitize_cropping_ratio($config['cropping_ratio'] ?? 'free');
 
         // Merge with defaults so any missing fields (including enabled) get defaults (enabled=true)
         $sanitized = wp_parse_args($sanitized, $this->default_config);

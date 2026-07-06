@@ -7,14 +7,14 @@
  * @since 1.2.0
  */
 
-/* global Cropper, cpiu_params */
+/* global cpiu_params */
 
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
-    // Check if required dependencies are loaded
-    if (typeof Cropper === 'undefined' || typeof cpiu_params === 'undefined') {
-        console.error('CPIU Error: Cropper.js or cpiu_params not loaded.');
+    // Require plugin config
+    if (typeof cpiu_params === 'undefined') {
+        console.error('CPIU Error: cpiu_params not loaded.');
         return;
     }
 
@@ -27,10 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const previewContainer = document.getElementById('cpiu-image-preview');
     const externalPreviewContainer = document.getElementById('cpiu-image-preview-external');
     const errorContainer = document.getElementById('cpiu-error-container');
-    const cropperModal = document.getElementById('cpiu-cropper-modal');
-    const imageToCrop = document.getElementById('cpiu-image-to-crop');
-    const saveCropButton = document.getElementById('cpiu-save-cropped-image');
-    const closeCropButton = document.getElementById('cpiu-close-cropper-modal');
+    // Cropping is handled by the self-contained window.CPIUCropper module.
     const addToCartButton = document.querySelector('form.cart .single_add_to_cart_button');
     const uploadProgressContainer = document.getElementById('cpiu-upload-progress');
     const progressBar = document.getElementById('cpiu-progress-bar');
@@ -38,13 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const uploadLoadingModal = document.getElementById('cpiu-upload-loading');
     const uploadStatusText = document.getElementById('cpiu-upload-status');
 
-    // Debug: Check which elements exist
-    console.log('CPIU Debug - uploadButton:', uploadButton);
-    console.log('CPIU Debug - uploadModal:', uploadModal);
-    console.log('CPIU Debug - closeUploadModal:', closeUploadModal);
-    console.log('CPIU Debug - fileInput:', fileInput);
-    console.log('CPIU Debug - previewContainer:', previewContainer);
-    console.log('CPIU Debug - errorContainer:', errorContainer);
 
     // Validate essential elements exist
     if (!uploadButton || !uploadModal || !closeUploadModal) {
@@ -59,15 +49,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // External preview container is optional
     if (!externalPreviewContainer) {
-        console.warn('CPIU Warning: External preview container not found. Preview will only show in modal.');
     }
 
     // Initialize variables
-    let cropperInstance = null;
     let currentImageElement = null;
-    let uploadedImageData = []; // Array of { originalSrc, currentSrc, element, wrapper } for images
+    let uploadedImageData = []; // Array of { originalSrc, currentSrc, element, wrapper, name, mime } for images
     let uploadedPdfData = []; // Array of { file, name, wrapper } for PDF files
-    let currentShapeAsString = 'none'; // Default shape
 
     // PDF support flags
     const hasPdf = cpiu_params.has_pdf === true || cpiu_params.has_pdf === '1';
@@ -139,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 deleteBtn.title = cpiu_params.text_delete_image || 'Delete image';
 
                 // Add click handlers
-                imgElement.addEventListener('click', () => handleOpenCropper(imageData));
+                imgElement.addEventListener('click', () => openCropperFor(imageData));
                 deleteBtn.addEventListener('click', () => handleDeleteImage(imageData));
 
                 wrapper.appendChild(imgElement);
@@ -187,123 +174,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Modal functionality
     function openUploadModal() {
-        console.log('CPIU Debug - Opening modal');
         uploadModal.classList.add('show');
         document.body.classList.add('cpiu-modal-open', 'cpiu-no-scroll');
-    }
-
-    /**
-     * Generate Shape Selector HTML
-     */
-    function generateShapeSelector() {
-        // Shapes configuration
-        const shapes = [
-            { id: 'none', label: 'None', icon: '🚫', aspectRatio: NaN },
-            { id: 'square', label: 'Square', icon: '■', aspectRatio: 1 },
-            { id: 'rectangle', label: 'Rectangle', icon: '▭', aspectRatio: NaN },
-            { id: 'circle', label: 'Circle', icon: '●', aspectRatio: 1 },
-            { id: 'heart', label: 'Heart', icon: '♥', aspectRatio: 480 / 438.82 }
-        ];
-
-        const container = document.createElement('div');
-        container.className = 'cpiu-shape-selector-container';
-
-        const label = document.createElement('span');
-        label.className = 'cpiu-shape-label';
-        label.textContent = 'Select Shape: ';
-        container.appendChild(label);
-
-        const buttonsContainer = document.createElement('div');
-        buttonsContainer.className = 'cpiu-shape-buttons';
-
-        shapes.forEach(shape => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = `cpiu-shape-btn ${shape.id === 'none' ? 'active' : ''}`;
-            btn.dataset.shape = shape.id;
-            btn.dataset.aspectRatio = shape.aspectRatio;
-            btn.innerHTML = `<span class="cpiu-shape-icon">${shape.icon}</span> ${shape.label}`;
-            btn.title = `Crop as ${shape.label}`;
-
-            // Add event listener immediately
-            btn.addEventListener('click', (e) => handleShapeSelection(e, shape));
-
-            buttonsContainer.appendChild(btn);
-        });
-
-        container.appendChild(buttonsContainer);
-        return container;
-    }
-
-    /**
-     * Handle Shape Selection
-     */
-    function handleShapeSelection(event, shape) {
-        // Update active button state
-        const allBtns = document.querySelectorAll('.cpiu-shape-btn');
-        allBtns.forEach(b => b.classList.remove('active'));
-
-        // Handle click on icon or text span
-        const clickedBtn = event.target.closest('.cpiu-shape-btn');
-        if (clickedBtn) {
-            clickedBtn.classList.add('active');
-        }
-
-        // Update Cropper aspect ratio
-        if (cropperInstance) {
-            let newAspectRatio = shape.aspectRatio;
-
-            // If "None" is selected, use the admin configured ratio
-            if (shape.id === 'none') {
-                newAspectRatio = getAspectRatioFromSetting(croppingRatioSetting);
-            }
-
-            cropperInstance.setAspectRatio(newAspectRatio);
-
-            // Update crop box styling for visual feedback
-            const cropBox = document.querySelector('.cropper-view-box');
-            if (cropBox) {
-                // Reset classes
-                cropBox.classList.remove('cpiu-shape-circle', 'cpiu-shape-heart');
-
-                // Add specific class for masking preview
-                if (shape.id === 'circle') {
-                    cropBox.classList.add('cpiu-shape-circle');
-                } else if (shape.id === 'heart') {
-                    cropBox.classList.add('cpiu-shape-heart');
-                }
-            }
-        }
-
-        // Store current shape for save handler
-        currentShapeAsString = shape.id;
     }
 
     // Modal functionality
 
     function closeUploadModalFunc() {
-        console.log('CPIU Debug - Closing modal');
         uploadModal.classList.remove('show');
         document.body.classList.remove('cpiu-modal-open', 'cpiu-no-scroll');
     }
 
-    // Test modal functionality
-    console.log('CPIU Debug - Testing modal functionality');
-    console.log('CPIU Debug - Modal element exists:', !!uploadModal);
-    console.log('CPIU Debug - Button element exists:', !!uploadButton);
 
     // Event listeners for modal
-    console.log('CPIU Debug - Adding event listeners');
     uploadButton.addEventListener('click', function (e) {
-        console.log('CPIU Debug - Upload button clicked');
         e.preventDefault();
-        console.log('CPIU Debug - Modal element:', uploadModal);
-        console.log('CPIU Debug - Modal classes:', uploadModal.className);
         openUploadModal();
-        console.log('CPIU Debug - Modal classes after opening:', uploadModal.className);
     });
     closeUploadModal.addEventListener('click', function (e) {
-        console.log('CPIU Debug - Close button clicked');
         e.preventDefault();
         closeUploadModalFunc();
     });
@@ -311,7 +199,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add event listener for Done button
     if (doneButton) {
         doneButton.addEventListener('click', function (e) {
-            console.log('CPIU Debug - Done button clicked');
             e.preventDefault();
             closeUploadModalFunc();
         });
@@ -344,32 +231,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const shapeValidationEnabled = cpiu_params.shape_validation_enabled || false;
     const shapeRequirements = cpiu_params.shape_requirements || [];
 
-    // Cropping settings
-    const enableShapeCropping = cpiu_params.enable_shape_cropping === '1' || cpiu_params.enable_shape_cropping === true;
-    const croppingRatioSetting = cpiu_params.cropping_ratio || 'free';
-
-    /**
-     * Parse cropping ratio string to number
-     */
-    function getAspectRatioFromSetting(setting) {
-        if (!setting || setting === 'free') return NaN;
-
-        const parts = setting.split(':');
-        if (parts.length === 2) {
-            const width = parseFloat(parts[0]);
-            const height = parseFloat(parts[1]);
-            if (!isNaN(width) && !isNaN(height) && height !== 0) {
-                return width / height;
-            }
-        }
-        return NaN; // Default to free if invalid
-    }
+    // Live cropping config for the current product/variation. The cropper module
+    // reads these at open time, so switching variations updates them (see
+    // updateUIForConfig) instead of being frozen at page load.
+    let activeCropConfig = {
+        enableShapes: (cpiu_params.enable_shape_cropping === '1' || cpiu_params.enable_shape_cropping === true),
+        ratio: cpiu_params.cropping_ratio || 'free'
+    };
 
     // Calculate total required images from shape requirements if enabled
     let effectiveRequiredCount = requiredCount;
     if (shapeValidationEnabled && shapeRequirements.length > 0) {
         effectiveRequiredCount = shapeRequirements.reduce((sum, req) => sum + parseInt(req.quantity_required, 10), 0);
-        console.log('CPIU Debug - Shape validation enabled. Total required:', effectiveRequiredCount, 'Shapes:', shapeRequirements);
     }
 
     // Disable add to cart button initially
@@ -377,12 +250,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Add event listeners
     fileInput.addEventListener('change', handleFileSelection);
-    saveCropButton.addEventListener('click', handleSaveCrop);
-    closeCropButton.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        handleCloseCropper();
-    });
 
     /**
      * Handle file selection
@@ -424,7 +291,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const totalCount = uploadedImageData.length + uploadedPdfData.length;
                 if (totalCount >= requiredCount) {
                     updateValidationError(cpiu_params.error_more_images);
-                    console.warn(`CPIU: Max ${requiredCount} files. Skipped PDF: ${file.name}`);
                     filesProcessed++;
                     updateFileReadProgress(filesProcessed, totalFiles);
                     return;
@@ -458,7 +324,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         addImagePreview(e.target.result, file.name);
                     } else {
                         updateValidationError(cpiu_params.error_more_images);
-                        console.warn(`CPIU: Max ${requiredCount} files reached. Skipped: ${file.name}`);
                     }
                     filesProcessed++;
                     updateFileReadProgress(filesProcessed, totalFiles);
@@ -668,7 +533,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         uploadedImageData.push(imageData);
 
-        imgElement.addEventListener('click', () => handleOpenCropper(imageData));
+        imgElement.addEventListener('click', () => openCropperFor(imageData));
         deleteBtn.addEventListener('click', () => handleDeleteImage(imageData));
 
         // Sync with external preview
@@ -676,232 +541,32 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /**
-     * Handle opening cropper
+     * Open the crop tool for a preview image via the CPIUCropper module.
+     * Resolves with the cropped result (or null when cancelled); on success the
+     * preview + upload model are updated in place. Reads the LIVE crop config so
+     * variation switches take effect (activeCropConfig).
      */
-    function handleOpenCropper(imageData) {
-        console.log('CPIU Debug - Opening cropper');
-        if (!cropperModal || !imageToCrop || typeof Cropper === 'undefined') {
-            console.error('CPIU Error - Cropper elements missing:', {
-                cropperModal: !!cropperModal,
-                imageToCrop: !!imageToCrop,
-                Cropper: typeof Cropper
-            });
+    async function openCropperFor(imageData) {
+        if (!window.CPIUCropper || !imageData) {
             return;
         }
 
-        currentImageElement = imageData.element;
-        imageToCrop.src = imageData.currentSrc;
-
-        // Use both class and style for maximum compatibility
-        cropperModal.classList.add('show');
-
-        // Inject Shape Selector if not already present AND enabled
-        const cropperContent = cropperModal.querySelector('.cpiu-cropper-modal-content');
-        let existingSelector = cropperContent.querySelector('.cpiu-shape-selector-container');
-
-        if (enableShapeCropping) {
-            if (!existingSelector) {
-                const shapeSelector = generateShapeSelector();
-                const cropperContainer = document.getElementById('cpiu-cropper-container');
-                // Insert before the image container
-                cropperContent.insertBefore(shapeSelector, cropperContainer);
-            } else {
-                // Ensure it's visible
-                existingSelector.style.display = 'block';
-                // Reset to default on re-open
-                const noneBtn = existingSelector.querySelector('[data-shape="none"]');
-                if (noneBtn) noneBtn.click();
-            }
-        } else {
-            // If shape cropping is disabled, remove or hide the selector
-            if (existingSelector) {
-                existingSelector.style.display = 'none';
-            }
-        }
-
-        console.log('CPIU Debug - Cropper modal display set to flex');
-
-        if (cropperInstance) {
-            cropperInstance.destroy();
-        }
-
-        // Inject Restore Button if not present
-        const actionButtons = cropperModal.querySelector('.cpiu-cropper-actions');
-        let restoreBtn = document.getElementById('cpiu-restore-crop');
-        if (!restoreBtn && actionButtons) {
-            restoreBtn = document.createElement('button');
-            restoreBtn.type = 'button';
-            restoreBtn.id = 'cpiu-restore-crop';
-            restoreBtn.className = 'button cpiu-restore-btn';
-            restoreBtn.textContent = 'Restore Original';
-            restoreBtn.style.marginRight = '10px';
-
-            // Insert before Cancel button (which is usually the last one)
-            const cancelBtn = document.getElementById('cpiu-close-cropper-modal');
-            actionButtons.insertBefore(restoreBtn, cancelBtn);
-
-            // Add listener
-            restoreBtn.addEventListener('click', handleRestoreCrop);
-        }
-
-        // Determine initial aspect ratio
-        let initialAspectRatio = NaN;
-
-        if (enableShapeCropping) {
-            // Default to admin setting because "None" is default now
-            initialAspectRatio = getAspectRatioFromSetting(croppingRatioSetting);
-        } else {
-            // Use the setting
-            initialAspectRatio = getAspectRatioFromSetting(croppingRatioSetting);
-        }
-
-        // Small delay to ensure modal is visible before initializing cropper
-        setTimeout(() => {
-            try {
-                cropperInstance = new Cropper(imageToCrop, {
-                    aspectRatio: initialAspectRatio,
-                    viewMode: 1,
-                    autoCropArea: 0.8,
-                    responsive: true,
-                    background: false,
-                    modal: false,
-                    guides: true,
-                    center: true,
-                    highlight: false,
-                    cropBoxMovable: true,
-                    cropBoxResizable: true,
-                    toggleDragModeOnDblclick: false
-                });
-                console.log('CPIU Debug - Cropper initialized successfully');
-            } catch (error) {
-                console.error('CPIU Error - Failed to initialize cropper:', error);
-            }
-        }, 100);
-
-        if (addToCartButton) {
-            addToCartButton.disabled = true;
-        }
-        updateValidationError('');
-    }
-
-    /**
-     * Handle saving crop
-     */
-    function handleSaveCrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!cropperInstance || !currentImageElement) {
-            console.error("CPIU Error: Cropper/image ref missing.");
-            return;
-        }
-
-        let canvas = cropperInstance.getCroppedCanvas({
-            fillColor: (currentShapeAsString === 'none' || currentShapeAsString === 'square' || currentShapeAsString === 'rectangle') ? '#fff' : 'transparent',
-            imageSmoothingEnabled: true,
-            imageSmoothingQuality: 'medium'
+        const result = await window.CPIUCropper.open({
+            src: imageData.currentSrc,
+            originalSrc: imageData.originalSrc,
+            enableShapes: activeCropConfig.enableShapes,
+            ratioSetting: activeCropConfig.ratio,
+            accentColor: cpiu_params.progress_bar_color,
+            i18n: cpiu_params.cropper_i18n
         });
 
-        if (canvas) {
-            // Apply shape mask if needed
-            if (currentShapeAsString === 'circle' || currentShapeAsString === 'heart') {
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = canvas.height;
-                const ctx = tempCanvas.getContext('2d');
-
-                // 1. Draw Mask
-                ctx.fillStyle = '#000000'; // Color doesn't matter for masking, opacity does
-
-                if (currentShapeAsString === 'circle') {
-                    ctx.beginPath();
-                    ctx.arc(tempCanvas.width / 2, tempCanvas.height / 2, tempCanvas.width / 2, 0, 2 * Math.PI);
-                    ctx.fill();
-                } else if (currentShapeAsString === 'heart') {
-                    // SVG Path for heart (viewport 0 0 480 438.82)
-                    const heartPath = new Path2D('M438.82 41.18c-54.9-54.9-143.92-54.9-198.82 0-54.9-54.9-143.92-54.9-198.82 0-54.9 54.9-54.9 143.92 0 198.82L240 438.82 438.82 240c54.9-54.9 54.9-143.92 0-198.82Z');
-
-                    ctx.save();
-                    // Scale to fit canvas (maintain aspect ratio if needed, or stretch to fill crop box)
-                    // The SVG is roughly 480x439.
-                    const scaleX = tempCanvas.width / 480;
-                    const scaleY = tempCanvas.height / 438.82;
-                    // Center the heart
-                    ctx.translate(0, (tempCanvas.height - (438.82 * scaleY)) / 2); // vertical centering if needed, but here we fill
-                    ctx.scale(scaleX, scaleY);
-                    ctx.fill(heartPath);
-                    ctx.restore();
-                }
-
-                // 2. Composite Source Image (keep source only where destination is opaque)
-                ctx.globalCompositeOperation = 'source-in';
-                ctx.drawImage(canvas, 0, 0);
-
-                // Update canvas reference
-                canvas = tempCanvas;
-            }
-
-            // For shapes, we likely want PNG to preserve transparency
-            const mimeType = (currentShapeAsString === 'none' || currentShapeAsString === 'square' || currentShapeAsString === 'rectangle') ? 'image/jpeg' : 'image/png';
-            const quality = 0.9;
-
-            const croppedImageDataUrl = canvas.toDataURL(mimeType, quality);
-            const imageDataIndex = uploadedImageData.findIndex(data => data.element === currentImageElement);
-
-            if (imageDataIndex > -1) {
-                uploadedImageData[imageDataIndex].element.src = croppedImageDataUrl;
-                uploadedImageData[imageDataIndex].currentSrc = croppedImageDataUrl;
-
-                // Sync with external preview
-                syncImagePreview();
-            } else {
-                console.error("CPIU Error: Could not find image data to update.");
-            }
-
-            handleCloseCropper();
-        } else {
-            console.error("CPIU Error: Could not get cropped canvas.");
-            alert(cpiu_params.text_crop_error || 'Could not crop image.');
+        if (result) { // null = cancelled
+            imageData.element.src = result.dataUrl;
+            imageData.currentSrc = result.dataUrl;
+            imageData.mime = result.mime; // remember real mime for upload naming
+            syncImagePreview();
+            validateImageCount();
         }
-    }
-
-    /**
-     * Handle restoring original image
-     */
-    function handleRestoreCrop(event) {
-        event.preventDefault();
-
-        if (!cropperInstance || !currentImageElement) return;
-
-        const imageData = uploadedImageData.find(data => data.element === currentImageElement);
-        if (imageData && imageData.originalSrc) {
-            // Replace cropper image with original source
-            cropperInstance.replace(imageData.originalSrc);
-
-            // Also update the hidden image ref to ensure if they just save immediately it works
-            const imageToCrop = document.getElementById('cpiu-image-to-crop');
-            if (imageToCrop) {
-                imageToCrop.src = imageData.originalSrc;
-            }
-        }
-    }
-
-    /**
-     * Handle closing cropper
-     */
-    function handleCloseCropper() {
-        console.log('CPIU Debug - Closing cropper');
-        if (cropperModal) {
-            cropperModal.classList.remove('show');
-        }
-
-        if (cropperInstance) {
-            cropperInstance.destroy();
-            cropperInstance = null;
-        }
-
-        currentImageElement = null;
-        validateImageCount();
     }
 
     /**
@@ -1124,12 +789,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         try {
-            // Convert each cropped image Data URL → native Blob and append
+            // Convert each cropped image Data URL → native Blob and append.
+            // Name the blob to match its ACTUAL mime (cropping may output PNG for
+            // circle/heart or JPEG otherwise) so the file is saved with the
+            // correct extension server-side.
             for (let i = 0; i < uploadedImageData.length; i++) {
                 const dataUrl = uploadedImageData[i].currentSrc;
                 const blob = await fetch(dataUrl).then(r => r.blob());
-                const originalName = uploadedImageData[i].name || `image-${i}.jpg`;
-                formData.append('cpiu_files[]', blob, originalName);
+                const isPng = uploadedImageData[i].mime === 'image/png' || blob.type === 'image/png';
+                const ext = isPng ? 'png' : 'jpg';
+                const base = (uploadedImageData[i].name || `image-${i}`).replace(/\.[^.]+$/, '');
+                formData.append('cpiu_files[]', blob, `${base}.${ext}`);
             }
 
             // Append PDF File objects directly (no conversion needed)
@@ -1284,6 +954,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 maxFileSize = parseInt(config.max_file_size, 10);
                 allowedTypes = config.allowed_types || ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
+                // Keep the crop tool in sync with the selected variation.
+                activeCropConfig.enableShapes = (config.enable_shape_cropping === '1' || config.enable_shape_cropping === true);
+                activeCropConfig.ratio = config.cropping_ratio || 'free';
+
                 if (shapeValidationEnabled && shapeRequirements.length > 0) {
                     effectiveRequiredCount = shapeRequirements.reduce((sum, req) => sum + parseInt(req.quantity_required, 10), 0);
                 } else {
@@ -1354,12 +1028,8 @@ document.addEventListener('DOMContentLoaded', function () {
             doneButton.style.borderColor = color;
         }
 
-        // Apply color to save crop button
-        const saveCropButton = document.getElementById('cpiu-save-cropped-image');
-        if (saveCropButton && !saveCropButton.closest('.elementor-widget-cpiu-product-image-upload')) {
-            saveCropButton.style.backgroundColor = color;
-            saveCropButton.style.borderColor = color;
-        }
+        // (The crop tool's Save button is themed inside the CPIUCropper module
+        // via the accentColor option.)
 
         // Apply color to any elements with cpiu-dynamic-bg class
         const dynamicBgElements = document.querySelectorAll('.cpiu-dynamic-bg');

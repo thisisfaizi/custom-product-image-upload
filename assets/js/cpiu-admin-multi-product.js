@@ -90,10 +90,6 @@ jQuery(document).ready(function ($) {
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
-                    console.log('CPIU - Sending AJAX request with nonce:', cpiu_admin.nonce);
-                    console.log('CPIU - Search term:', params.term);
-                    console.log('CPIU - Page:', params.page);
-                    console.log('CPIU - All params:', params);
 
                     // Ensure search_term is not undefined or null
                     var searchTerm = params.term || '';
@@ -105,15 +101,11 @@ jQuery(document).ready(function ($) {
                         page: params.page || 1
                     };
 
-                    console.log('CPIU - Final data being sent:', data);
                     return data;
                 },
                 processResults: function (data, params) {
                     params.page = params.page || 1;
 
-                    console.log('CPIU - AJAX Response:', data);
-                    console.log('CPIU - Response success:', data.success);
-                    console.log('CPIU - Response data:', data.data);
 
                     // Check if the response is successful and has the expected structure
                     if (!data.success || !data.data || !data.data.products) {
@@ -207,12 +199,10 @@ jQuery(document).ready(function ($) {
      * Initialize form handlers
      */
     function initializeFormHandlers() {
-        console.log('CPIU Admin - Initializing form handlers');
 
         // Global settings form - Use delegated event to ensure it's caught
         $(document).on('submit', '#cpiu-global-settings-form', function (e) {
             e.preventDefault();
-            console.log('CPIU Admin - Global settings form submitted');
             saveGlobalSettings();
             return false;
         });

@@ -1,0 +1,255 @@
+/**
+ * NDV Product Image Upload — cropper module styles.
+ * Self-contained; owns everything the JS-built modal renders. Theme-agnostic.
+ * Accent color is injected per-open via the --cpiu-crx-accent custom property.
+ */
+
+.cpiu-crx-modal {
+    --cpiu-crx-accent: #4CAF50;
+    position: fixed;
+    inset: 0;
+    z-index: 100050; /* above the upload-loading modal (100002) */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.72);
+    box-sizing: border-box;
+}
+
+.cpiu-crx-modal.is-open {
+    display: flex;
+}
+
+body.cpiu-crx-lock {
+    overflow: hidden;
+}
+
+.cpiu-crx-panel {
+    background: #fff;
+    color: #1e1e1e;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.cpiu-crx-title {
+    margin: 0 0 14px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e1e1e;
+}
+
+/* ---- Shape selector ---- */
+.cpiu-crx-shapes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.cpiu-crx-shapes-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+}
+
+.cpiu-crx-shapes-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.cpiu-crx-shape {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    font-size: 13px;
+    line-height: 1;
+    color: #334155;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cpiu-crx-shape:hover {
+    background: #e2e8f0;
+}
+
+.cpiu-crx-shape.is-active {
+    background: var(--cpiu-crx-accent);
+    border-color: var(--cpiu-crx-accent);
+    color: #fff;
+}
+
+.cpiu-crx-shape-ico {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* ---- Toolbar ---- */
+.cpiu-crx-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.cpiu-crx-tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 34px;
+    padding: 0;
+    color: #334155;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cpiu-crx-tool:hover {
+    background: var(--cpiu-crx-accent);
+    border-color: var(--cpiu-crx-accent);
+    color: #fff;
+}
+
+.cpiu-crx-tool svg {
+    display: block;
+}
+
+/* ---- Stage / canvas ---- */
+.cpiu-crx-stage {
+    position: relative;
+    width: 100%;
+    height: min(58vh, 420px);
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.cpiu-crx-stage cropper-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ---- Live shape preview overlay (fills the selection, non-interactive) ---- */
+.cpiu-crx-shape-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.cpiu-crx-shape-overlay.is-circle {
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+}
+
+/* Heart: identical viewBox/normalization to the export mask so preview===output.
+   preserveAspectRatio='none' stretches the path to the selection box. */
+.cpiu-crx-shape-overlay.is-heart {
+    background: rgba(255, 255, 255, 0.18);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 438.82' preserveAspectRatio='none'%3E%3Cpath d='M438.82 41.18c-54.9-54.9-143.92-54.9-198.82 0-54.9-54.9-143.92-54.9-198.82 0-54.9 54.9-54.9 143.92 0 198.82L240 438.82 438.82 240c54.9-54.9 54.9-143.92 0-198.82Z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 438.82' preserveAspectRatio='none'%3E%3Cpath d='M438.82 41.18c-54.9-54.9-143.92-54.9-198.82 0-54.9-54.9-143.92-54.9-198.82 0-54.9 54.9-54.9 143.92 0 198.82L240 438.82 438.82 240c54.9-54.9 54.9-143.92 0-198.82Z'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+/* ---- Actions ---- */
+.cpiu-crx-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.cpiu-crx-btn {
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.cpiu-crx-save {
+    background: var(--cpiu-crx-accent);
+    color: #fff;
+    order: 3;
+}
+
+.cpiu-crx-save:hover {
+    opacity: 0.9;
+}
+
+.cpiu-crx-restore {
+    background: #fff;
+    color: #334155;
+    border-color: #cbd5e1;
+    order: 1;
+    margin-right: auto;
+}
+
+.cpiu-crx-restore:hover {
+    background: #f1f5f9;
+}
+
+.cpiu-crx-cancel {
+    background: #eef2f6;
+    color: #334155;
+    order: 2;
+}
+
+.cpiu-crx-cancel:hover {
+    background: #e2e8f0;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .cpiu-crx-panel {
+        padding: 15px;
+    }
+
+    .cpiu-crx-stage {
+        height: min(48vh, 320px);
+    }
+
+    .cpiu-crx-actions {
+        justify-content: stretch;
+    }
+
+    .cpiu-crx-btn {
+        flex: 1 1 auto;
+    }
+
+    .cpiu-crx-restore {
+        margin-right: 0;
+        order: 3;
+        flex-basis: 100%;
+    }
+}

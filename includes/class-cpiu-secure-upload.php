@@ -114,7 +114,7 @@ class CPIU_Secure_Upload
     {
         if (!file_exists($this->upload_dir)) {
             if (!wp_mkdir_p($this->upload_dir)) {
-                throw new Exception(esc_html__('Could not create secure upload directory.', 'custom-product-image-upload'));
+                throw new Exception(esc_html__('Could not create secure upload directory.', 'nowdigiverse-product-image-upload'));
             }
         }
 
@@ -138,6 +138,7 @@ class CPIU_Secure_Upload
 
         // Create index.php to prevent directory listing
         if (!file_exists($index_file)) {
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Writing a static protection file into the plugin's own uploads subdirectory.
             file_put_contents($index_file, '<?php // Silence is golden.');
         }
 
@@ -195,21 +196,25 @@ class CPIU_Secure_Upload
             // Validate base64 format
             if (empty($base64_data) || strpos($base64_data, 'data:image/') !== 0) {
                 /* translators: %1$d: Image index */
-                throw new Exception(sprintf(esc_html__('Invalid image format for image %1$d.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('Invalid image format for image %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             // Extract image data
             if (!preg_match('/^data:image\/(png|jpe?g|gif|webp);base64,(.*)$/i', $base64_data, $matches) || count($matches) !== 3) {
                 /* translators: %1$d: Image index */
-                throw new Exception(sprintf(esc_html__('Unsupported image type for image %1$d.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('Unsupported image type for image %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             $image_type = strtolower($matches[1]);
+            // Decode the client-side cropped image sent as a data:image/...;base64 URI.
+            // Not obfuscation: the decoded bytes are fully re-validated below
+            // (finfo MIME, exif_imagetype, executable-signature scan) before saving.
+            // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
             $image_data = base64_decode($matches[2]);
 
             if ($image_data === false) {
                 /* translators: %1$d: Image index */
-                throw new Exception(sprintf(esc_html__('Failed to decode image %1$d.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('Failed to decode image %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             // Create temporary file for validation
@@ -224,9 +229,10 @@ class CPIU_Secure_Upload
                 $file_path = $this->upload_dir . '/' . $secure_filename;
 
                 // Move file to final location
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Writing validated image bytes to the plugin's protected uploads subdirectory.
                 if (!file_put_contents($file_path, $image_data)) {
                     /* translators: %1$d: Image index */
-                    throw new Exception(sprintf(esc_html__('Failed to save image %1$d.', 'custom-product-image-upload'), $index + 1));
+                    throw new Exception(sprintf(esc_html__('Failed to save image %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
                 }
 
                 // Set file permissions (non-executable)
@@ -279,12 +285,12 @@ class CPIU_Secure_Upload
         try {
             if (!isset($file_entry['error']) || $file_entry['error'] !== UPLOAD_ERR_OK) {
                 /* translators: %1$d: file index number */
-                throw new Exception(sprintf(esc_html__('Upload error for file %1$d.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('Upload error for file %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             if (!is_uploaded_file($file_entry['tmp_name'])) {
                 /* translators: %1$d: file index number */
-                throw new Exception(sprintf(esc_html__('Invalid file for file %1$d.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('Invalid file for file %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             $original_name = sanitize_file_name($file_entry['name']);
@@ -292,7 +298,7 @@ class CPIU_Secure_Upload
 
             if (!in_array($ext, $this->allowed_extensions)) {
                 /* translators: %1$d: file index number, %2$s: file extension */
-                throw new Exception(sprintf(esc_html__('File %1$d has an invalid extension: %2$s.', 'custom-product-image-upload'), $index + 1, esc_html($ext)));
+                throw new Exception(sprintf(esc_html__('File %1$d has an invalid extension: %2$s.', 'nowdigiverse-product-image-upload'), $index + 1, esc_html($ext)));
             }
 
             // Route to security validation
@@ -308,7 +314,7 @@ class CPIU_Secure_Upload
             }
             if (!$wp_filesystem->move($file_entry['tmp_name'], $file_path, true)) {
                 /* translators: %1$d: file index number */
-                throw new Exception(sprintf(esc_html__('Failed to save file %1$d.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('Failed to save file %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
@@ -339,12 +345,20 @@ class CPIU_Secure_Upload
      */
     private function create_temp_file($data, $extension)
     {
-        $temp_dir = sys_get_temp_dir();
+        // Keep validation scratch files inside the plugin's own uploads
+        // subfolder (already created and .htaccess-protected by
+        // ensure_secure_directory()). Never write outside wp-content/uploads.
+        $temp_dir = $this->upload_dir . '/tmp';
+        if (!file_exists($temp_dir)) {
+            wp_mkdir_p($temp_dir);
+        }
+
         $temp_filename = 'cpiu_temp_' . wp_generate_password(12, false) . '.' . $extension;
         $temp_path = $temp_dir . '/' . $temp_filename;
 
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
         if (file_put_contents($temp_path, $data) === false) {
-            throw new Exception(esc_html__('Could not create temporary file for validation.', 'custom-product-image-upload'));
+            throw new Exception(esc_html__('Could not create temporary file for validation.', 'nowdigiverse-product-image-upload'));
         }
 
         return $temp_path;
@@ -359,7 +373,7 @@ class CPIU_Secure_Upload
 
         // Check file exists
         if (!file_exists($file_path)) {
-            throw new Exception(esc_html__('File does not exist.', 'custom-product-image-upload'));
+            throw new Exception(esc_html__('File does not exist.', 'nowdigiverse-product-image-upload'));
         }
 
         // Check file size
@@ -367,14 +381,14 @@ class CPIU_Secure_Upload
         if ($file_size > $this->max_file_size) {
             throw new Exception(sprintf(
                 /* translators: %1$s: Formatted file size, %2$s: Formatted maximum allowed size */
-                esc_html__('File size (%1$s) exceeds maximum allowed size (%2$s).', 'custom-product-image-upload'),
+                esc_html__('File size (%1$s) exceeds maximum allowed size (%2$s).', 'nowdigiverse-product-image-upload'),
                 esc_html(size_format($file_size)),
                 esc_html(size_format($this->max_file_size))
             ));
         }
 
         if ($file_size < 100) { // Minimum 100 bytes
-            throw new Exception(esc_html__('File is too small to be a valid image.', 'custom-product-image-upload'));
+            throw new Exception(esc_html__('File is too small to be a valid image.', 'nowdigiverse-product-image-upload'));
         }
 
         // Determine if this is a PDF (skip image-specific checks)
@@ -392,7 +406,7 @@ class CPIU_Secure_Upload
         $wp_filetype = wp_check_filetype_and_ext($file_path, $filename_to_check, $allowed_wp_types);
 
         if (!$wp_filetype['type'] || !$wp_filetype['ext']) {
-            throw new Exception(esc_html__('Invalid file type. Please upload a valid image or PDF file.', 'custom-product-image-upload'));
+            throw new Exception(esc_html__('Invalid file type. Please upload a valid image or PDF file.', 'nowdigiverse-product-image-upload'));
         }
 
         // Validate MIME type using finfo as additional security check
@@ -403,7 +417,7 @@ class CPIU_Secure_Upload
 
             if (!in_array($mime_type, $this->allowed_mime_types)) {
                 /* translators: %1$s: MIME type */
-                throw new Exception(sprintf(esc_html__('Invalid MIME type: %1$s. Only image or PDF files are allowed.', 'custom-product-image-upload'), esc_html($mime_type)));
+                throw new Exception(sprintf(esc_html__('Invalid MIME type: %1$s. Only image or PDF files are allowed.', 'nowdigiverse-product-image-upload'), esc_html($mime_type)));
             }
         }
 
@@ -411,7 +425,7 @@ class CPIU_Secure_Upload
         if (!$is_pdf && function_exists('exif_imagetype')) {
             $image_type = exif_imagetype($file_path);
             if ($image_type === false) {
-                throw new Exception(esc_html__('File is not a valid image.', 'custom-product-image-upload'));
+                throw new Exception(esc_html__('File is not a valid image.', 'nowdigiverse-product-image-upload'));
             }
 
             // Map exif_imagetype constants to our allowed types
@@ -423,7 +437,7 @@ class CPIU_Secure_Upload
             );
 
             if (!in_array($image_type, $valid_exif_types)) {
-                throw new Exception(esc_html__('Unsupported image type.', 'custom-product-image-upload'));
+                throw new Exception(esc_html__('Unsupported image type.', 'nowdigiverse-product-image-upload'));
             }
         }
 
@@ -431,20 +445,34 @@ class CPIU_Secure_Upload
         $path_info = pathinfo($filename_to_check);
         $extension = isset($path_info['extension']) ? strtolower($path_info['extension']) : '';
 
-        // Check if filename contains multiple dots (potential double extension)
-        if (substr_count($filename_to_check, '.') > 1) {
-            throw new Exception(esc_html__('Files with multiple extensions are not allowed.', 'custom-product-image-upload'));
+        // Check for dangerous double extensions (e.g. photo.php.jpg). Legitimate
+        // filenames may contain multiple dots (e.g. "my.photo.jpg" or names where
+        // sanitize_file_name() converted spaces to dashes), so only reject when an
+        // intermediate segment is a known executable/script extension.
+        $dangerous_extensions = array(
+            'php', 'php3', 'php4', 'php5', 'php7', 'phtml', 'phar', 'pht',
+            'exe', 'com', 'bat', 'cmd', 'sh', 'bash', 'cgi', 'pl',
+            'asp', 'aspx', 'jsp', 'js', 'htaccess', 'html', 'htm', 'svg',
+        );
+        $name_segments = explode('.', $filename_to_check);
+        // Drop the actual (last) extension; inspect everything before it.
+        array_pop($name_segments);
+        array_shift($name_segments); // Drop the base name portion.
+        foreach ($name_segments as $segment) {
+            if (in_array(strtolower($segment), $dangerous_extensions, true)) {
+                throw new Exception(esc_html__('Files with multiple extensions are not allowed.', 'nowdigiverse-product-image-upload'));
+            }
         }
 
         // Validate extension matches expected
         if ($extension !== $expected_extension) {
             /* translators: %1$s: Uploaded file extension, %2$s: Expected file extension */
-            throw new Exception(sprintf(esc_html__('File extension (%1$s) does not match expected type (%2$s).', 'custom-product-image-upload'), esc_html($extension), esc_html($expected_extension)));
+            throw new Exception(sprintf(esc_html__('File extension (%1$s) does not match expected type (%2$s).', 'nowdigiverse-product-image-upload'), esc_html($extension), esc_html($expected_extension)));
         }
 
         // Check for path traversal attempts
         if (strpos($filename_to_check, '..') !== false || strpos($filename_to_check, '/') !== false || strpos($filename_to_check, '\\') !== false) {
-            throw new Exception(esc_html__('Invalid characters in filename detected.', 'custom-product-image-upload'));
+            throw new Exception(esc_html__('Invalid characters in filename detected.', 'nowdigiverse-product-image-upload'));
         }
 
         // Additional security: Check file content for executable signatures
@@ -465,7 +493,7 @@ class CPIU_Secure_Upload
         $image_info = getimagesize($file_path);
 
         if ($image_info === false) {
-            throw new Exception(esc_html__('Could not determine image dimensions.', 'custom-product-image-upload'));
+            throw new Exception(esc_html__('Could not determine image dimensions.', 'nowdigiverse-product-image-upload'));
         }
 
         $width = $image_info[0];
@@ -475,7 +503,7 @@ class CPIU_Secure_Upload
         if ($this->min_width > 0 && $width < $this->min_width) {
             throw new Exception(sprintf(
                 /* translators: %1$d: Uploaded image width, %2$d: Minimum required width */
-                esc_html__('Image width (%1$dpx) is below minimum required width (%2$dpx).', 'custom-product-image-upload'),
+                esc_html__('Image width (%1$dpx) is below minimum required width (%2$dpx).', 'nowdigiverse-product-image-upload'),
                 esc_html($width),
                 esc_html($this->min_width)
             ));
@@ -484,7 +512,7 @@ class CPIU_Secure_Upload
         if ($this->min_height > 0 && $height < $this->min_height) {
             throw new Exception(sprintf(
                 /* translators: %1$d: Uploaded image height, %2$d: Minimum required height */
-                esc_html__('Image height (%1$dpx) is below minimum required height (%2$dpx).', 'custom-product-image-upload'),
+                esc_html__('Image height (%1$dpx) is below minimum required height (%2$dpx).', 'nowdigiverse-product-image-upload'),
                 esc_html($height),
                 esc_html($this->min_height)
             ));
@@ -494,7 +522,7 @@ class CPIU_Secure_Upload
         if ($this->max_width > 0 && $width > $this->max_width) {
             throw new Exception(sprintf(
                 /* translators: %1$d: Uploaded image width, %2$d: Maximum allowed width */
-                esc_html__('Image width (%1$dpx) exceeds maximum allowed width (%2$dpx).', 'custom-product-image-upload'),
+                esc_html__('Image width (%1$dpx) exceeds maximum allowed width (%2$dpx).', 'nowdigiverse-product-image-upload'),
                 esc_html($width),
                 esc_html($this->max_width)
             ));
@@ -503,7 +531,7 @@ class CPIU_Secure_Upload
         if ($this->max_height > 0 && $height > $this->max_height) {
             throw new Exception(sprintf(
                 /* translators: %1$d: Uploaded image height, %2$d: Maximum allowed height */
-                esc_html__('Image height (%1$dpx) exceeds maximum allowed height (%2$dpx).', 'custom-product-image-upload'),
+                esc_html__('Image height (%1$dpx) exceeds maximum allowed height (%2$dpx).', 'nowdigiverse-product-image-upload'),
                 esc_html($height),
                 esc_html($this->max_height)
             ));
@@ -525,7 +553,7 @@ class CPIU_Secure_Upload
         // Read first 1KB to check for executable signatures
         $header = $wp_filesystem->get_contents($file_path);
         if ($header === false) {
-            throw new Exception(esc_html__('Could not read file for security check.', 'custom-product-image-upload'));
+            throw new Exception(esc_html__('Could not read file for security check.', 'nowdigiverse-product-image-upload'));
         }
 
         // Limit to first 1KB for performance
@@ -533,7 +561,7 @@ class CPIU_Secure_Upload
 
         // Check for PHP tags
         if (strpos($header, '<?php') !== false || strpos($header, '<?=') !== false) {
-            throw new Exception(esc_html__('File contains executable code and is not allowed.', 'custom-product-image-upload'));
+            throw new Exception(esc_html__('File contains executable code and is not allowed.', 'nowdigiverse-product-image-upload'));
         }
 
         // Check for other executable signatures
@@ -552,7 +580,7 @@ class CPIU_Secure_Upload
 
         foreach ($executable_signatures as $signature) {
             if (stripos($header, $signature) !== false) {
-                throw new Exception(esc_html__('File contains potentially malicious content.', 'custom-product-image-upload'));
+                throw new Exception(esc_html__('File contains potentially malicious content.', 'nowdigiverse-product-image-upload'));
             }
         }
     }
@@ -605,13 +633,13 @@ class CPIU_Secure_Upload
             // Basic $_FILES error check
             if (!isset($file_entry['error']) || $file_entry['error'] !== UPLOAD_ERR_OK) {
                 /* translators: %1$d: file index number */
-                throw new Exception(sprintf(esc_html__('Upload error for file %1$d.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('Upload error for file %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             // Validate that the file was actually uploaded via HTTP POST
             if (!is_uploaded_file($file_entry['tmp_name'])) {
                 /* translators: %1$d: File index */
-                throw new Exception(sprintf(esc_html__('Invalid upload for file %1$d.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('Invalid upload for file %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             // Validate extension
@@ -619,14 +647,14 @@ class CPIU_Secure_Upload
             $ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
             if ($ext !== 'pdf') {
                 /* translators: %1$d: File index */
-                throw new Exception(sprintf(esc_html__('File %1$d is not a PDF.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('File %1$d is not a PDF.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             // Validate file size
             if ($file_entry['size'] > $this->max_file_size) {
                 throw new Exception(sprintf(
                     /* translators: %1$s: Formatted file size, %2$s: Formatted maximum allowed size */
-                    esc_html__('PDF size (%1$s) exceeds maximum allowed size (%2$s).', 'custom-product-image-upload'),
+                    esc_html__('PDF size (%1$s) exceeds maximum allowed size (%2$s).', 'nowdigiverse-product-image-upload'),
                     esc_html(size_format($file_entry['size'])),
                     esc_html(size_format($this->max_file_size))
                 ));
@@ -634,7 +662,7 @@ class CPIU_Secure_Upload
 
             if ($file_entry['size'] < 100) {
                 /* translators: %1$d: File index */
-                throw new Exception(sprintf(esc_html__('File %1$d is too small to be a valid PDF.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('File %1$d is too small to be a valid PDF.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             // Validate MIME type using finfo
@@ -645,7 +673,7 @@ class CPIU_Secure_Upload
 
                 if ($mime_type !== 'application/pdf') {
                     /* translators: %1$s: MIME type */
-                    throw new Exception(sprintf(esc_html__('Invalid MIME type for PDF: %1$s.', 'custom-product-image-upload'), esc_html($mime_type)));
+                    throw new Exception(sprintf(esc_html__('Invalid MIME type for PDF: %1$s.', 'nowdigiverse-product-image-upload'), esc_html($mime_type)));
                 }
             }
 
@@ -662,7 +690,7 @@ class CPIU_Secure_Upload
             }
             if (!$wp_filesystem->move($file_entry['tmp_name'], $file_path, true)) {
                 /* translators: %1$d: File index */
-                throw new Exception(sprintf(esc_html__('Failed to save PDF %1$d.', 'custom-product-image-upload'), $index + 1));
+                throw new Exception(sprintf(esc_html__('Failed to save PDF %1$d.', 'nowdigiverse-product-image-upload'), $index + 1));
             }
 
             // Set file permissions (non-executable)

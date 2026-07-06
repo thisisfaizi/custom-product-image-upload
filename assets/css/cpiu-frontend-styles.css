@@ -233,89 +233,6 @@
     transition: color 0.3s ease;
 }
 
-/* Cropper Modal */
-#cpiu-cropper-modal {
-    display: none !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: rgba(0, 0, 0, 0.8) !important;
-    z-index: 100001 !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: 20px;
-    width: 100vw;
-    height: 100vh;
-}
-
-#cpiu-cropper-modal.show {
-    display: flex !important;
-}
-
-#cpiu-cropper-modal>div {
-    position: relative;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-#cpiu-cropper-modal h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-align: center;
-    color: #333;
-}
-
-#cpiu-cropper-container {
-    max-width: 500px;
-    max-height: 50vh;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-#cpiu-image-to-crop {
-    max-width: 100%;
-    display: block;
-}
-
-#cpiu-cropper-modal .button {
-    margin: 5px;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-#cpiu-save-cropped-image {
-    background: #0073aa;
-    color: white;
-}
-
-#cpiu-save-cropped-image:hover {
-    background: #005a87;
-}
-
-#cpiu-close-cropper-modal {
-    background: #f0f0f0;
-    color: #333;
-}
-
-#cpiu-close-cropper-modal:hover {
-    background: #e0e0e0;
-}
-
 /* Upload Loading Modal */
 #cpiu-upload-loading {
     display: none !important;
@@ -484,20 +401,6 @@
         width: 80px;
         height: 80px;
         margin: 3px;
-    }
-
-    #cpiu-cropper-modal {
-        padding: 10px;
-    }
-
-    #cpiu-cropper-modal>div {
-        padding: 15px;
-        max-width: 95vw;
-    }
-
-    #cpiu-cropper-container {
-        max-width: 100%;
-        max-height: 40vh;
     }
 
     #cpiu-upload-loading>div {
@@ -732,60 +635,6 @@
     transition: background-color 0.3s ease;
 }
 
-/* Cropper Modal */
-#cpiu-cropper-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 100001;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    width: 100vw;
-    height: 100vh;
-}
-
-.cpiu-cropper-content {
-    position: relative;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.cpiu-cropper-content h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-#cpiu-cropper-container {
-    max-width: 500px;
-    max-height: 50vh;
-    margin-bottom: 15px;
-}
-
-#cpiu-image-to-crop {
-    max-width: 100%;
-    display: block;
-}
-
-.cpiu-cropper-buttons {
-    text-align: center;
-    margin-top: auto;
-}
-
-#cpiu-save-cropped-image {
-    margin-right: 10px;
-}
-
 /* Upload Loading Modal */
 #cpiu-upload-loading {
     position: fixed;
@@ -993,122 +842,96 @@
     color: #555;
 }
 
-/* WooCommerce Cart Table Images - Grid Layout - Maximum Specificity */
-body.woocommerce-cart table.cart .cpiu-cart-thumbnails,
-body.woocommerce-checkout table.cart .cpiu-cart-thumbnails,
-body #add_payment_method table.cart .cpiu-cart-thumbnails,
-.woocommerce-cart table.cart .cpiu-cart-thumbnails,
-.woocommerce-checkout table.cart .cpiu-cart-thumbnails,
-#add_payment_method table.cart .cpiu-cart-thumbnails,
-table.cart .cpiu-cart-thumbnails,
+/* =========================================================================
+   Uploaded-file thumbnails: cart, checkout and order pages
+   Responsive by design: CSS Grid auto-fill reflows columns to the available
+   width — no media queries needed. (The customer order/email markup keeps
+   inline styles because stylesheets never load inside emails.)
+   ========================================================================= */
+
+/* Classic cart + blocks cart thumbnail grids */
+.cpiu-cart-images-container,
 .cpiu-cart-thumbnails {
     display: grid;
-    gap: 2px;
-    margin: 5px 0;
-    padding: 5px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    line-height: 1;
-    max-width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 8px;
+    margin: 5px 0 0;
+    padding: 0;
+    max-width: 320px;
     box-sizing: border-box;
-    width: 100%;
+    background: none;
+    border: none;
+    line-height: 1;
     clear: both;
 }
 
-body.woocommerce-cart table.cart .cpiu-order-image-container,
-body.woocommerce-checkout table.cart .cpiu-order-image-container,
-body #add_payment_method table.cart .cpiu-order-image-container,
-.woocommerce-cart table.cart .cpiu-order-image-container,
-.woocommerce-checkout table.cart .cpiu-order-image-container,
-#add_payment_method table.cart .cpiu-order-image-container,
-table.cart .cpiu-order-image-container,
-.cpiu-order-image-container {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 25px;
-    height: 25px;
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    background: #fff;
-    overflow: hidden;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+/* One thumbnail cell (image or PDF) */
+.cpiu-cart-thumbnails .cpiu-order-image-container,
+.cpiu-cart-images-container .cpiu-cart-thumb,
+.cpiu-cart-images-container .cpiu-cart-pdf-icon,
+.cpiu-cart-thumbnails .cpiu-pdf-icon-container {
+    width: 100%;
+    max-width: 72px;
+    aspect-ratio: 1 / 1;
     margin: 0;
     padding: 0;
-    float: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f6f7f7;
+    overflow: hidden;
+    box-sizing: border-box;
+    display: block;
     position: relative;
     flex-shrink: 0;
 }
 
-body.woocommerce-cart table.cart .cpiu-order-image-container:hover,
-body.woocommerce-checkout table.cart .cpiu-order-image-container:hover,
-body #add_payment_method table.cart .cpiu-order-image-container:hover,
-.woocommerce-cart table.cart .cpiu-order-image-container:hover,
-.woocommerce-checkout table.cart .cpiu-order-image-container:hover,
-#add_payment_method table.cart .cpiu-order-image-container:hover,
-table.cart .cpiu-order-image-container:hover,
-.cpiu-order-image-container:hover {
-    border-color: #007cba;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    transform: translateY(-1px);
+.cpiu-cart-images-container .cpiu-cart-pdf-icon,
+.cpiu-cart-thumbnails .cpiu-pdf-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
 }
 
-body.woocommerce-cart table.cart img.cpiu-order-image,
-body.woocommerce-checkout table.cart img.cpiu-order-image,
-body #add_payment_method table.cart img.cpiu-order-image,
-.woocommerce-cart table.cart img.cpiu-order-image,
-.woocommerce-checkout table.cart img.cpiu-order-image,
-#add_payment_method table.cart img.cpiu-order-image,
-table.cart img.cpiu-order-image,
-img.cpiu-order-image,
-body.woocommerce-cart table.cart .cpiu-cart-thumbnails img,
-body.woocommerce-checkout table.cart .cpiu-cart-thumbnails img,
-body #add_payment_method table.cart .cpiu-cart-thumbnails img,
-.woocommerce-cart table.cart .cpiu-cart-thumbnails img,
-.woocommerce-checkout table.cart .cpiu-cart-thumbnails img,
-#add_payment_method table.cart .cpiu-cart-thumbnails img,
-table.cart .cpiu-cart-thumbnails img,
-.cpiu-cart-thumbnails img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 1px;
+.cpiu-cart-images-container img.cpiu-cart-thumb,
+.cpiu-cart-thumbnails .cpiu-order-image-container img,
+.cpiu-cart-thumbnails img.cpiu-order-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: block;
-    border: none;
     margin: 0;
     padding: 0;
+    border: none;
     max-width: 100%;
     max-height: 100%;
     vertical-align: top;
     box-sizing: border-box;
 }
 
-/* Order Item Images */
+/* Customer order pages (stylesheet mirror of the inline email-safe styles) */
 .cpiu-order-item-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 12px;
+    align-items: start;
+    max-width: 560px;
     margin-top: 8px;
 }
 
-.cpiu-order-item-images strong {
-    display: block;
-    margin-bottom: 3px;
-}
-
 .cpiu-order-item-images a {
-    display: inline-block;
-    margin: 3px 3px 3px 0;
+    display: block;
+    margin: 0;
 }
 
 .cpiu-order-item-images img {
-    width: 50px;
-    height: 50px;
-    border: 1px solid #ddd;
+    width: 100%;
+    border: none;
     object-fit: cover;
-    vertical-align: middle;
+    vertical-align: top;
 }
 
-/* Admin Order Item Images */
+/* Admin order screen file cards */
 .cpiu-admin-order-item-images {
     margin-top: 5px;
 }
@@ -1116,19 +939,6 @@ table.cart .cpiu-cart-thumbnails img,
 .cpiu-admin-order-item-images strong {
     display: block;
     margin-bottom: 3px;
-}
-
-.cpiu-admin-order-item-images a {
-    display: inline-block;
-    margin: 2px 2px 2px 0;
-}
-
-.cpiu-admin-order-item-images img {
-    width: 45px;
-    height: 45px;
-    border: 1px solid #ccc;
-    object-fit: cover;
-    vertical-align: middle;
 }
 
 /* WooCommerce specific container styling */
@@ -1291,60 +1101,6 @@ table.cart .cpiu-cart-thumbnails img,
     font-size: 16px;
     font-weight: 600;
     transition: background-color 0.3s ease;
-}
-
-/* Cropper Modal */
-#cpiu-cropper-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 100001;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    width: 100vw;
-    height: 100vh;
-}
-
-.cpiu-cropper-content {
-    position: relative;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.cpiu-cropper-content h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-#cpiu-cropper-container {
-    max-width: 500px;
-    max-height: 50vh;
-    margin-bottom: 15px;
-}
-
-#cpiu-image-to-crop {
-    max-width: 100%;
-    display: block;
-}
-
-.cpiu-cropper-buttons {
-    text-align: center;
-    margin-top: auto;
-}
-
-#cpiu-save-cropped-image {
-    margin-right: 10px;
 }
 
 /* Upload Loading Modal */
@@ -1885,42 +1641,6 @@ body.cpiu-modal-open {
     -o-filter: none;
 }
 
-/* Cropper modal buttons styling */
-#cpiu-save-cropped-image,
-#cpiu-close-cropper-modal {
-    background: #0073aa;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-    text-transform: none;
-    letter-spacing: normal;
-    word-spacing: normal;
-    text-indent: 0;
-    text-shadow: none;
-    filter: none;
-    -webkit-filter: none;
-    -moz-filter: none;
-    -ms-filter: none;
-    -o-filter: none;
-}
-
-#cpiu-save-cropped-image:hover,
-#cpiu-close-cropper-modal:hover {
-    background: #005a87;
-}
-
-#cpiu-close-cropper-modal {
-    background: #f0f0f0;
-    color: #333;
-}
-
-#cpiu-close-cropper-modal:hover {
-    background: #e0e0e0;
-}
 
 /* Prevent theme animation conflicts */
 .cpiu-upload-button-container,
@@ -1937,61 +1657,6 @@ body.cpiu-modal-open {
     -moz-transform: none !important;
     -o-transform: none !important;
     -ms-transform: none !important;
-}
-
-/* Cropper Modal Styles */
-.cpiu-cropper-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 100001;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    width: 100vw;
-    height: 100vh;
-}
-
-.cpiu-cropper-modal-content {
-    position: relative;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.cpiu-cropper-title {
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.cpiu-cropper-container {
-    max-width: 500px;
-    max-height: 50vh;
-    margin-bottom: 15px;
-}
-
-.cpiu-image-to-crop {
-    max-width: 100%;
-    display: block;
-}
-
-.cpiu-cropper-actions {
-    text-align: center;
-    margin-top: auto;
-}
-
-.cpiu-save-crop-btn {
-    margin-right: 10px;
 }
 
 /* Upload Loading Modal Styles */
@@ -2530,140 +2195,29 @@ div.cpiu-cart-thumbnails {
 }
 
 
-/* ==========================================================================
-   12. Shape Selector & Restore Button
-   ========================================================================== */
-
-/* Shape Selector Container */
-.cpiu-shape-selector-container {
-    margin-bottom: 18px;
-    text-align: center;
-    background: transparent;
-    padding: 12px 16px;
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
-}
-
-.cpiu-shape-label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 600;
-    font-size: 12px;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-}
-
-.cpiu-shape-buttons {
-    display: inline-flex;
-    justify-content: center;
-    gap: 4px;
-    flex-wrap: nowrap;
-    background: #f1f5f9;
-    border-radius: 10px;
-    padding: 4px;
-}
-
-/* Shape Button — specificity override for theme conflicts */
-.cpiu-shape-buttons .cpiu-shape-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 7px 14px;
-    border: none !important;
-    border-radius: 8px !important;
-    background: transparent !important;
-    cursor: pointer;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: #64748b !important;
-    transition: all 0.2s ease;
-    box-shadow: none !important;
-    white-space: nowrap;
-    position: relative;
-    outline: none !important;
-    line-height: 1.4;
-    min-height: auto;
-    letter-spacing: 0;
-    text-transform: none;
-}
-
-.cpiu-shape-buttons .cpiu-shape-btn:hover {
-    background: rgba(255, 255, 255, 0.6) !important;
-    color: #334155 !important;
-    border: none !important;
-    box-shadow: none !important;
-    transform: none;
-}
-
-.cpiu-shape-buttons .cpiu-shape-btn.active {
-    background: #fff !important;
-    border: none !important;
-    color: #0f172a !important;
-    font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
-    transform: none;
-}
-
-.cpiu-shape-btn.active .cpiu-shape-icon {
-    filter: none;
-}
-
-.cpiu-shape-icon {
-    font-size: 13px;
-    line-height: 1;
-    transition: none;
-}
-
-/* Restore Button */
-.cpiu-restore-btn {
-    background: #6c757d !important;
-    /* Secondary grey color */
-    color: white !important;
-}
-
-.cpiu-restore-btn:hover {
-    background: #5a6268 !important;
-}
-
-/* Cropper View Masking (Visual Feedback) */
-.cropper-view-box.cpiu-shape-circle {
-    border-radius: 50%;
-    outline: 2px solid #fff;
-    /* Optional: adds a white border to make it distinct */
-}
-
-.cropper-view-box.cpiu-shape-heart {
-    /* Heart shape masking using SVG data URI */
-    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 438.82"><path d="M438.82 41.18c-54.9-54.9-143.92-54.9-198.82 0-54.9-54.9-143.92-54.9-198.82 0-54.9 54.9-54.9 143.92 0 198.82L240 438.82 438.82 240c54.9-54.9 54.9-143.92 0-198.82Z"/></svg>');
-    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 438.82"><path d="M438.82 41.18c-54.9-54.9-143.92-54.9-198.82 0-54.9-54.9-143.92-54.9-198.82 0-54.9 54.9-54.9 143.92 0 198.82L240 438.82 438.82 240c54.9-54.9 54.9-143.92 0-198.82Z"/></svg>');
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-    outline: none;
-    /* Remove default outline if any */
-    background-color: transparent !important;
-    /* Ensure background is transparent for mask to work cleanly */
-}
-
-/* White Outline for Heart Shape */
-.cropper-view-box.cpiu-shape-heart::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
+/* Upload-loading modal progress bar (markup in class-cpiu-frontend-manager.php;
+   fill color is applied by JS via the cpiu-dynamic-bg pattern) */
+.cpiu-progress-bar-container {
+    margin: 20px 0;
     width: 100%;
-    height: 100%;
-    /* SVG stroke heart */
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 438.82"><path fill="none" stroke="white" stroke-width="4" d="M438.82 41.18c-54.9-54.9-143.92-54.9-198.82 0-54.9-54.9-143.92-54.9-198.82 0-54.9 54.9-54.9 143.92 0 198.82L240 438.82 438.82 240c54.9-54.9 54.9-143.92 0-198.82Z"/></svg>');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    pointer-events: none;
-    /* Allow clicks to pass through */
-    z-index: 100;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
+
+.cpiu-progress-bar-container .cpiu-progress-bar {
+    width: 0%;
+    height: 20px;
+    background-color: #4CAF50;
+    border-radius: 5px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    line-height: 20px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+}
+

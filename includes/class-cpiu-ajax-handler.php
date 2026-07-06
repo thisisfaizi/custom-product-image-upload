@@ -26,7 +26,7 @@ class CPIU_Ajax_Handler
      */
     public function __construct()
     {
-        $this->data_manager = new CPIU_Data_Manager();
+        $this->data_manager = CPIU_Data_Manager::instance();
         $this->init_hooks();
         $this->init_cache_groups();
     }
@@ -46,7 +46,6 @@ class CPIU_Ajax_Handler
     {
         // Product search
         add_action('wp_ajax_cpiu_search_products', array($this, 'search_products'));
-        add_action('wp_ajax_nopriv_cpiu_search_products', array($this, 'search_products'));
 
         // Configuration management
         add_action('wp_ajax_cpiu_save_configuration', array($this, 'save_configuration'));
@@ -77,12 +76,12 @@ class CPIU_Ajax_Handler
         // Verify nonce (accept from POST or GET to match Select2 transport)
         $nonce = isset($_REQUEST['nonce']) ? sanitize_text_field(wp_unslash($_REQUEST['nonce'])) : '';
         if (empty($nonce) || !wp_verify_nonce($nonce, 'cpiu_admin_nonce')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'nowdigiverse-product-image-upload')));
         }
 
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'nowdigiverse-product-image-upload')));
         }
 
         // Validate and sanitize search term (accept from POST or GET)
@@ -92,7 +91,7 @@ class CPIU_Ajax_Handler
         $per_page = 20;
 
         if (empty($search_term)) {
-            wp_send_json_error(array('message' => esc_html__('Search term is required.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Search term is required.', 'nowdigiverse-product-image-upload')));
         }
 
         // Check if search term is a numeric ID
@@ -296,12 +295,12 @@ class CPIU_Ajax_Handler
         // Verify nonce
         $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
         if (empty($nonce) || !wp_verify_nonce($nonce, 'cpiu_admin_nonce')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'nowdigiverse-product-image-upload')));
         }
 
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'nowdigiverse-product-image-upload')));
         }
 
         // Sanitize and validate input data
@@ -330,7 +329,7 @@ class CPIU_Ajax_Handler
             $config_data['button_text'] = isset($raw_config['button_text']) ? sanitize_text_field($raw_config['button_text']) : '';
 
             if (empty($config_data['button_text'])) {
-                wp_send_json_error(array('message' => esc_html__('Button text cannot be empty.', 'custom-product-image-upload')));
+                wp_send_json_error(array('message' => esc_html__('Button text cannot be empty.', 'nowdigiverse-product-image-upload')));
             }
             $config_data['button_color'] = isset($raw_config['button_color']) ? sanitize_hex_color($raw_config['button_color']) : '#4CAF50';
             $config_data['enabled'] = isset($raw_config['enabled']) ? (bool) $raw_config['enabled'] : true;
@@ -358,19 +357,19 @@ class CPIU_Ajax_Handler
                     }
                 }
                 if (is_array($shape_req)) {
-                    $config_data['shape_requirements'] = $shape_req;
+                    $config_data['shape_requirements'] = map_deep($shape_req, 'sanitize_text_field');
                 }
             }
         }
 
         if ($product_id <= 0) {
-            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'nowdigiverse-product-image-upload')));
         }
 
         // Verify product exists
         $product = wc_get_product($product_id);
         if (!$product) {
-            wp_send_json_error(array('message' => esc_html__('Product not found.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Product not found.', 'nowdigiverse-product-image-upload')));
         }
 
         // Sanitize configuration data
@@ -382,11 +381,11 @@ class CPIU_Ajax_Handler
 
         if ($result) {
             wp_send_json_success(array(
-                'message' => esc_html__('Configuration saved successfully.', 'custom-product-image-upload'),
+                'message' => esc_html__('Configuration saved successfully.', 'nowdigiverse-product-image-upload'),
                 'config' => $this->data_manager->get_product_configuration($product_id)
             ));
         } else {
-            wp_send_json_error(array('message' => esc_html__('Failed to save configuration.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Failed to save configuration.', 'nowdigiverse-product-image-upload')));
         }
     }
 
@@ -398,26 +397,26 @@ class CPIU_Ajax_Handler
         // Verify nonce
         $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
         if (empty($nonce) || !wp_verify_nonce($nonce, 'cpiu_admin_nonce')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'nowdigiverse-product-image-upload')));
         }
 
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'nowdigiverse-product-image-upload')));
         }
 
         $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
 
         if ($product_id <= 0) {
-            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'nowdigiverse-product-image-upload')));
         }
 
         $result = $this->data_manager->delete_product_configuration($product_id);
 
         if ($result) {
-            wp_send_json_success(array('message' => esc_html__('Configuration deleted successfully.', 'custom-product-image-upload')));
+            wp_send_json_success(array('message' => esc_html__('Configuration deleted successfully.', 'nowdigiverse-product-image-upload')));
         } else {
-            wp_send_json_error(array('message' => esc_html__('Failed to delete configuration.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Failed to delete configuration.', 'nowdigiverse-product-image-upload')));
         }
     }
 
@@ -429,65 +428,36 @@ class CPIU_Ajax_Handler
         // Verify nonce
         $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
         if (empty($nonce) || !wp_verify_nonce($nonce, 'cpiu_admin_nonce')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'nowdigiverse-product-image-upload')));
         }
 
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'nowdigiverse-product-image-upload')));
         }
 
         // Sanitize and validate settings data
         $settings_data = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
         if (!is_array($settings_data)) {
-            wp_send_json_error(array('message' => esc_html__('Invalid settings data.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Invalid settings data.', 'nowdigiverse-product-image-upload')));
         }
 
 
 
-        // Sanitize settings
-        $sanitized_settings = array(
-            'image_count' => max(1, min(50, absint($settings_data['image_count']))),
-            'max_file_size' => max(1024, absint($settings_data['max_file_size'])),
-            'button_text' => sanitize_text_field($settings_data['button_text']),
-            'button_color' => sanitize_hex_color($settings_data['button_color']),
-            'disable_express_checkout' => !empty($settings_data['disable_express_checkout']),
-            'resolution_validation' => !empty($settings_data['resolution_validation']),
-            'min_width' => max(0, min(10000, absint($settings_data['min_width'] ?? 0))),
-            'min_height' => max(0, min(10000, absint($settings_data['min_height'] ?? 0))),
-            'max_width' => max(0, min(10000, absint($settings_data['max_width'] ?? 0))),
-            'max_height' => max(0, min(10000, absint($settings_data['max_height'] ?? 0))),
-            'enable_shape_cropping' => isset($settings_data['enable_shape_cropping']) ? (bool) $settings_data['enable_shape_cropping'] : true,
-            'cropping_ratio' => isset($settings_data['cropping_ratio']) ? sanitize_text_field($settings_data['cropping_ratio']) : 'free'
-        );
-
-        // Sanitize allowed types
-        $sanitized_settings['allowed_types'] = array();
-        if (is_array($settings_data['allowed_types'])) {
-            $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf');
-            foreach ($settings_data['allowed_types'] as $type) {
-                $type = sanitize_text_field($type);
-                if (in_array(strtolower($type), $allowed_extensions)) {
-                    $sanitized_settings['allowed_types'][] = strtolower($type);
-                }
-            }
-        }
-
-        // Ensure at least one type is allowed
-        if (empty($sanitized_settings['allowed_types'])) {
-            $sanitized_settings['allowed_types'] = array('jpg', 'jpeg', 'png');
-        }
+        // Sanitize via the Data Manager — single source of truth (also runs as
+        // the registered sanitize callback for the option).
+        $sanitized_settings = $this->data_manager->sanitize_default_settings($settings_data);
 
         $result = $this->data_manager->save_default_settings($sanitized_settings);
 
         if ($result) {
             wp_send_json_success(array(
-                'message' => esc_html__('Default settings saved successfully.', 'custom-product-image-upload'),
+                'message' => esc_html__('Default settings saved successfully.', 'nowdigiverse-product-image-upload'),
                 'settings' => $this->data_manager->get_default_settings()
             ));
         } else {
-            wp_send_json_error(array('message' => esc_html__('Failed to save default settings.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Failed to save default settings.', 'nowdigiverse-product-image-upload')));
         }
     }
 
@@ -499,48 +469,35 @@ class CPIU_Ajax_Handler
         // Verify nonce
         $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
         if (empty($nonce) || !wp_verify_nonce($nonce, 'cpiu_admin_nonce')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'nowdigiverse-product-image-upload')));
         }
 
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Insufficient permissions.', 'nowdigiverse-product-image-upload')));
         }
 
         // Sanitize and validate settings data
-        $settings_data = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $settings_data = isset($_POST['settings']) ? map_deep(wp_unslash($_POST['settings']), 'sanitize_text_field') : array();
 
         if (!is_array($settings_data)) {
-            wp_send_json_error(array('message' => esc_html__('Invalid settings data.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Invalid settings data.', 'nowdigiverse-product-image-upload')));
         }
 
-        // Sanitize settings
-        $sanitized_settings = array(
-            'disable_express_checkout' => !empty($settings_data['disable_express_checkout']),
-            'enable_order_image_cleanup' => !empty($settings_data['enable_order_image_cleanup']),
-            'order_image_cleanup_days' => isset($settings_data['order_image_cleanup_days']) ? max(1, min(365, absint($settings_data['order_image_cleanup_days']))) : 30,
-        );
-
-        /**
-         * Filters sanitized global settings before they are saved.
-         *
-         * Add-ons (e.g. the Pro Elementor integration) hook this to sanitize and
-         * persist their own fields rendered via the `cpiu_global_settings_fields` action.
-         *
-         * @param array $sanitized_settings Settings about to be saved.
-         * @param array $settings_data      Raw (unslashed) posted settings.
-         */
-        $sanitized_settings = apply_filters('cpiu_save_global_settings', $sanitized_settings, $settings_data);
+        // Sanitize via the Data Manager — single source of truth. The
+        // 'cpiu_save_global_settings' extension filter for add-ons is applied
+        // inside sanitize_global_settings().
+        $sanitized_settings = $this->data_manager->sanitize_global_settings($settings_data);
 
         $result = $this->data_manager->save_global_settings($sanitized_settings);
 
         if ($result) {
             wp_send_json_success(array(
-                'message' => esc_html__('Global settings saved successfully.', 'custom-product-image-upload'),
+                'message' => esc_html__('Global settings saved successfully.', 'nowdigiverse-product-image-upload'),
                 'settings' => $this->data_manager->get_global_settings()
             ));
         } else {
-            wp_send_json_error(array('message' => esc_html__('Failed to save global settings.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Failed to save global settings.', 'nowdigiverse-product-image-upload')));
         }
     }
 
@@ -551,7 +508,7 @@ class CPIU_Ajax_Handler
     {
         // Verify nonce
         if (!isset($_POST['security']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['security'])), 'cpiu_image_upload_nonce')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'nowdigiverse-product-image-upload')));
         }
 
         // Handle both authenticated and guest users
@@ -575,31 +532,31 @@ class CPIU_Ajax_Handler
         $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
 
         if ($product_id <= 0) {
-            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'nowdigiverse-product-image-upload')));
         }
 
         // Verify product exists and is supported type
         $product = wc_get_product($product_id);
         if (!$product) {
-            wp_send_json_error(array('message' => esc_html__('Product not found.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Product not found.', 'nowdigiverse-product-image-upload')));
         }
 
         // Check if product type is supported (exclude external/affiliate products)
         if (in_array($product->get_type(), array('external', 'affiliate'))) {
-            wp_send_json_error(array('message' => esc_html__('Image upload is not supported for this product type.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Image upload is not supported for this product type.', 'nowdigiverse-product-image-upload')));
         }
 
         // Get product configuration
         $config = $this->data_manager->get_frontend_configuration($product_id);
 
         if (!$config) {
-            wp_send_json_error(array('message' => esc_html__('Product not configured for image upload.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Product not configured for image upload.', 'nowdigiverse-product-image-upload')));
         }
 
         // Validate and sanitize image data
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
         if (!isset($_POST['images_data']) || empty($_POST['images_data'])) {
-            wp_send_json_error(array('message' => esc_html__('No image data received.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('No image data received.', 'nowdigiverse-product-image-upload')));
         }
 
         $raw_images_data = sanitize_textarea_field(wp_unslash($_POST['images_data']));
@@ -609,7 +566,7 @@ class CPIU_Ajax_Handler
             wp_send_json_error(array(
                 'message' => sprintf(
                     /* translators: %1$d: Number of allowed images */
-                    esc_html__('Invalid data or image count. Expected %1$d images.', 'custom-product-image-upload'),
+                    esc_html__('Invalid data or image count. Expected %1$d images.', 'nowdigiverse-product-image-upload'),
                     $config['image_count']
                 )
             ));
@@ -668,7 +625,7 @@ class CPIU_Ajax_Handler
             if (!empty($uploaded_files)) {
                 $secure_upload->cleanup_files($uploaded_files);
             }
-            wp_send_json_error(array('message' => esc_html__('Unexpected error: Not all images processed.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Unexpected error: Not all images processed.', 'nowdigiverse-product-image-upload')));
         }
 
         // Add to cart with guest session tracking
@@ -691,13 +648,13 @@ class CPIU_Ajax_Handler
 
         if ($cart_item_key) {
 
-            wp_send_json_success(array('message' => esc_html__('Product added to cart!', 'custom-product-image-upload')));
+            wp_send_json_success(array('message' => esc_html__('Product added to cart!', 'nowdigiverse-product-image-upload')));
         } else {
             // Clean up files if cart addition fails
             if (!empty($uploaded_files)) {
                 $secure_upload->cleanup_files($uploaded_files);
             }
-            wp_send_json_error(array('message' => esc_html__('Failed to add product to cart.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Failed to add product to cart.', 'nowdigiverse-product-image-upload')));
         }
     }
 
@@ -709,7 +666,7 @@ class CPIU_Ajax_Handler
     {
         // Verify nonce
         if (!isset($_POST['security']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['security'])), 'cpiu_image_upload_nonce')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'nowdigiverse-product-image-upload')));
         }
 
         $is_logged_in = is_user_logged_in();
@@ -730,31 +687,31 @@ class CPIU_Ajax_Handler
         // Validate product ID
         $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
         if ($product_id <= 0) {
-            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'nowdigiverse-product-image-upload')));
         }
 
         $product = wc_get_product($product_id);
         if (!$product) {
-            wp_send_json_error(array('message' => esc_html__('Product not found.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Product not found.', 'nowdigiverse-product-image-upload')));
         }
 
         if (in_array($product->get_type(), array('external', 'affiliate'))) {
-            wp_send_json_error(array('message' => esc_html__('File upload is not supported for this product type.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('File upload is not supported for this product type.', 'nowdigiverse-product-image-upload')));
         }
 
         $config = $this->data_manager->get_frontend_configuration($product_id);
         if (!$config) {
-            wp_send_json_error(array('message' => esc_html__('Product not configured for file upload.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Product not configured for file upload.', 'nowdigiverse-product-image-upload')));
         }
 
         // Verify PDF is actually an allowed type for this product
         if (!in_array('pdf', $config['allowed_types'])) {
-            wp_send_json_error(array('message' => esc_html__('PDF uploads are not enabled for this product.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('PDF uploads are not enabled for this product.', 'nowdigiverse-product-image-upload')));
         }
 
         // Check that files were received
         if (empty($_FILES['pdf_files'])) {
-            wp_send_json_error(array('message' => esc_html__('No PDF files received.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('No PDF files received.', 'nowdigiverse-product-image-upload')));
         }
 
         // Normalise $_FILES['pdf_files'] into an array of single-file entries
@@ -785,7 +742,7 @@ class CPIU_Ajax_Handler
             wp_send_json_error(array(
                 'message' => sprintf(
                     /* translators: %1$d: Number of required files */
-                    esc_html__('Invalid file count. Expected %1$d file(s).', 'custom-product-image-upload'),
+                    esc_html__('Invalid file count. Expected %1$d file(s).', 'nowdigiverse-product-image-upload'),
                     intval($config['image_count'])
                 )
             ));
@@ -846,12 +803,12 @@ class CPIU_Ajax_Handler
         $cart_item_key = WC()->cart->add_to_cart($product_id, 1, $variation_id, array(), $cart_item_data);
 
         if ($cart_item_key) {
-            wp_send_json_success(array('message' => esc_html__('Product added to cart!', 'custom-product-image-upload')));
+            wp_send_json_success(array('message' => esc_html__('Product added to cart!', 'nowdigiverse-product-image-upload')));
         } else {
             if (!empty($uploaded_files)) {
                 $secure_upload->cleanup_files($uploaded_files);
             }
-            wp_send_json_error(array('message' => esc_html__('Failed to add product to cart.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Failed to add product to cart.', 'nowdigiverse-product-image-upload')));
         }
     }
 
@@ -862,7 +819,7 @@ class CPIU_Ajax_Handler
     {
         // Verify nonce
         if (!isset($_POST['security']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['security'])), 'cpiu_image_upload_nonce')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Security check failed.', 'nowdigiverse-product-image-upload')));
         }
 
         $is_logged_in = is_user_logged_in();
@@ -883,26 +840,26 @@ class CPIU_Ajax_Handler
         // Validate product ID
         $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
         if ($product_id <= 0) {
-            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Invalid product ID.', 'nowdigiverse-product-image-upload')));
         }
 
         $product = wc_get_product($product_id);
         if (!$product) {
-            wp_send_json_error(array('message' => esc_html__('Product not found.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Product not found.', 'nowdigiverse-product-image-upload')));
         }
 
         if (in_array($product->get_type(), array('external', 'affiliate'))) {
-            wp_send_json_error(array('message' => esc_html__('File upload is not supported for this product type.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('File upload is not supported for this product type.', 'nowdigiverse-product-image-upload')));
         }
 
         $config = $this->data_manager->get_frontend_configuration($product_id);
         if (!$config) {
-            wp_send_json_error(array('message' => esc_html__('Product not configured for file upload.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Product not configured for file upload.', 'nowdigiverse-product-image-upload')));
         }
 
         // Check if files were received
         if (empty($_FILES['cpiu_files'])) {
-            wp_send_json_error(array('message' => esc_html__('No files received.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('No files received.', 'nowdigiverse-product-image-upload')));
         }
 
         // Normalize $_FILES['cpiu_files'] into an array of single-file entries
@@ -940,7 +897,7 @@ class CPIU_Ajax_Handler
             wp_send_json_error(array(
                 'message' => sprintf(
                     /* translators: %1$d: Number of required files */
-                    esc_html__('Invalid file count. Expected %1$d file(s).', 'custom-product-image-upload'),
+                    esc_html__('Invalid file count. Expected %1$d file(s).', 'nowdigiverse-product-image-upload'),
                     $expected_count
                 )
             ));
@@ -1011,12 +968,12 @@ class CPIU_Ajax_Handler
         $cart_item_key = WC()->cart->add_to_cart($product_id, 1, $variation_id, array(), $cart_item_data);
 
         if ($cart_item_key) {
-            wp_send_json_success(array('message' => esc_html__('Product added to cart!', 'custom-product-image-upload')));
+            wp_send_json_success(array('message' => esc_html__('Product added to cart!', 'nowdigiverse-product-image-upload')));
         } else {
             if (!empty($uploaded_files)) {
                 $secure_upload->cleanup_files($uploaded_files);
             }
-            wp_send_json_error(array('message' => esc_html__('Failed to add product to cart.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Failed to add product to cart.', 'nowdigiverse-product-image-upload')));
         }
     }
 
@@ -1045,7 +1002,7 @@ class CPIU_Ajax_Handler
         $last_request_time = get_transient($last_request_key);
 
         if ($last_request_time !== false && (time() - $last_request_time) < 5) {
-            wp_send_json_error(array('message' => esc_html__('Please wait a moment before uploading again.', 'custom-product-image-upload')));
+            wp_send_json_error(array('message' => esc_html__('Please wait a moment before uploading again.', 'nowdigiverse-product-image-upload')));
         }
 
         set_transient($last_request_key, time(), 300); // 5 minutes
@@ -1056,21 +1013,22 @@ class CPIU_Ajax_Handler
      */
     private function get_client_ip_address()
     {
-        $ip_keys = array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR');
+        // Only trust REMOTE_ADDR: proxy headers such as X-Forwarded-For are
+        // client-controlled and would let an attacker rotate identities to
+        // bypass the guest rate limit. Sites behind a trusted reverse proxy
+        // can supply the real client IP via the filter below.
+        $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
 
-        foreach ($ip_keys as $key) {
-            if (isset($_SERVER[$key]) && !empty($_SERVER[$key])) {
-                $raw = sanitize_text_field(wp_unslash($_SERVER[$key]));
-                foreach (explode(',', $raw) as $ip) {
-                    $ip = trim($ip);
-                    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
-                        return $ip;
-                    }
-                }
-            }
+        if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+            $ip = '0.0.0.0';
         }
 
-        return isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '0.0.0.0';
+        /**
+         * Filters the client IP address used for rate limiting and logging.
+         *
+         * @param string $ip The detected client IP (REMOTE_ADDR).
+         */
+        return apply_filters('cpiu_client_ip', $ip);
     }
 }
 

@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Custom Product Image Upload 1.0.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/custom-product-image-upload\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/nowdigiverse-product-image-upload\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -12,87 +12,87 @@ msgstr ""
 "POT-Creation-Date: 2026-06-03T00:14:43+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: custom-product-image-upload\n"
+"X-Domain: nowdigiverse-product-image-upload\n"
 
 #. Plugin Name of the plugin
-#: custom-product-image-upload.php
+#: nowdigiverse-product-image-upload.php
 #: includes/class-cpiu-admin-interface.php:279
 msgid "Custom Product Image Upload"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: custom-product-image-upload.php
+#: nowdigiverse-product-image-upload.php
 msgid "https://nowdigiverse.com/products/"
 msgstr ""
 
 #. Description of the plugin
-#: custom-product-image-upload.php
+#: nowdigiverse-product-image-upload.php
 msgid "Let WooCommerce customers upload and crop images and PDFs for products before checkout, with per-product rules and secure file handling."
 msgstr ""
 
 #. Author of the plugin
-#: custom-product-image-upload.php
+#: nowdigiverse-product-image-upload.php
 msgid "Nowdigiverse"
 msgstr ""
 
 #. Author URI of the plugin
-#: custom-product-image-upload.php
+#: nowdigiverse-product-image-upload.php
 msgid "https://nowdigiverse.com/"
 msgstr ""
 
-#: custom-product-image-upload.php:105
+#: nowdigiverse-product-image-upload.php:105
 msgid "Custom Product Image Upload requires WooCommerce to be installed and active."
 msgstr ""
 
-#: custom-product-image-upload.php:187
-#: custom-product-image-upload.php:199
+#: nowdigiverse-product-image-upload.php:187
+#: nowdigiverse-product-image-upload.php:199
 msgid "Upload Files"
 msgstr ""
 
-#: custom-product-image-upload.php:414
+#: nowdigiverse-product-image-upload.php:414
 msgid "Custom Product Image Upload - Installation Complete!"
 msgstr ""
 
-#: custom-product-image-upload.php:416
+#: nowdigiverse-product-image-upload.php:416
 msgid "Thank you for installing Custom Product Image Upload. The plugin has been successfully activated."
 msgstr ""
 
-#: custom-product-image-upload.php:419
+#: nowdigiverse-product-image-upload.php:419
 msgid "🔒 Data Protection:"
 msgstr ""
 
-#: custom-product-image-upload.php:420
+#: nowdigiverse-product-image-upload.php:420
 msgid "Your data is safe - the plugin does not delete any settings or uploaded images when deactivated. You control data removal from the Uninstall Preferences tab."
 msgstr ""
 
-#: custom-product-image-upload.php:425
+#: nowdigiverse-product-image-upload.php:425
 msgid "Configure Plugin"
 msgstr ""
 
-#: custom-product-image-upload.php:428
-#: custom-product-image-upload.php:466
+#: nowdigiverse-product-image-upload.php:428
+#: nowdigiverse-product-image-upload.php:466
 msgid "Dismiss"
 msgstr ""
 
-#: custom-product-image-upload.php:453
+#: nowdigiverse-product-image-upload.php:453
 msgid "Custom Product Image Upload - Data Management"
 msgstr ""
 
-#: custom-product-image-upload.php:454
+#: nowdigiverse-product-image-upload.php:454
 msgid "Before uninstalling this plugin, you can choose whether to keep or delete your plugin data:"
 msgstr ""
 
-#: custom-product-image-upload.php:459
+#: nowdigiverse-product-image-upload.php:459
 msgid "Keep Data When Uninstalling"
 msgstr ""
 
-#: custom-product-image-upload.php:463
+#: nowdigiverse-product-image-upload.php:463
 msgid "Delete Data When Uninstalling"
 msgstr ""
 
-#: custom-product-image-upload.php:480
-#: custom-product-image-upload.php:490
-#: custom-product-image-upload.php:506
+#: nowdigiverse-product-image-upload.php:480
+#: nowdigiverse-product-image-upload.php:490
+#: nowdigiverse-product-image-upload.php:506
 #: includes/class-cpiu-admin-interface.php:1247
 #: includes/class-cpiu-admin-interface.php:1264
 #: includes/class-cpiu-admin-interface.php:1301
@@ -108,7 +108,7 @@ msgstr ""
 msgid "Security check failed."
 msgstr ""
 
-#: custom-product-image-upload.php:493
+#: nowdigiverse-product-image-upload.php:493
 #: includes/class-cpiu-admin-interface.php:1251
 #: includes/class-cpiu-admin-interface.php:1268
 #: includes/class-cpiu-admin-interface.php:1305
@@ -121,38 +121,38 @@ msgstr ""
 msgid "Insufficient permissions."
 msgstr ""
 
-#: custom-product-image-upload.php:519
-#: custom-product-image-upload.php:521
+#: nowdigiverse-product-image-upload.php:519
+#: nowdigiverse-product-image-upload.php:521
 msgid "Settings"
 msgstr ""
 
-#: custom-product-image-upload.php:521
+#: nowdigiverse-product-image-upload.php:521
 msgid "Activate WooCommerce plugin to configure settings"
 msgstr ""
 
-#: custom-product-image-upload.php:547
-#: custom-product-image-upload.php:554
+#: nowdigiverse-product-image-upload.php:547
+#: nowdigiverse-product-image-upload.php:554
 msgid "Access denied. You do not have permission to view this file."
 msgstr ""
 
-#: custom-product-image-upload.php:547
-#: custom-product-image-upload.php:554
+#: nowdigiverse-product-image-upload.php:547
+#: nowdigiverse-product-image-upload.php:554
 msgid "Security Check Failed"
 msgstr ""
 
-#: custom-product-image-upload.php:559
+#: nowdigiverse-product-image-upload.php:559
 msgid "Invalid file request format."
 msgstr ""
 
-#: custom-product-image-upload.php:559
+#: nowdigiverse-product-image-upload.php:559
 msgid "Invalid File"
 msgstr ""
 
-#: custom-product-image-upload.php:566
+#: nowdigiverse-product-image-upload.php:566
 msgid "File not found."
 msgstr ""
 
-#: custom-product-image-upload.php:571
+#: nowdigiverse-product-image-upload.php:571
 msgid "Invalid file type."
 msgstr ""
 

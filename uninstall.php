@@ -1,10 +1,10 @@
 <?php
 /**
- * Uninstall script for Custom Product Image Upload plugin
- * 
+ * Uninstall script for NDV Product Image Upload for WooCommerce
+ *
  * This file handles the uninstallation process, respecting the user's data-retention
  * choice and following WordPress best practices.
- * 
+ *
  * @package Custom_Product_Image_Upload
  * @since 1.1
  */
@@ -20,7 +20,11 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 }
 
 /**
- * Enhanced uninstall function that respects user preferences and provides confirmation
+ * Remove plugin settings for the current site.
+ *
+ * Respects the user's data-retention preference. Order data is NEVER touched:
+ * uploaded files and the order item meta referencing them are always preserved
+ * for data integrity, as promised in the plugin's admin UI.
  */
 function cpiu_enhanced_uninstall()
 {
@@ -34,7 +38,7 @@ function cpiu_enhanced_uninstall()
         return;
     }
 
-    // User explicitly chose to delete data - proceed with cleanup
+    // User explicitly chose to delete plugin settings - proceed with cleanup
 
     // Delete all plugin options
     $options_to_delete = array(
@@ -55,24 +59,13 @@ function cpiu_enhanced_uninstall()
     // Clean up any transients
     delete_transient('cpiu_cdn_cache_last_refresh');
 
-    // Clean up any user meta related to the plugin
+    // Clean up plugin-related user meta (per-user UI preferences only)
     global $wpdb;
     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaDelete, WordPress.DB.SlowDBQuery.slow_db_query_meta_key
     $wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE 'cpiu_%'");
 
-    // Clean up any post meta related to the plugin (including order item meta)
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaDelete, WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-    $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE 'cpiu_%'");
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaDelete, WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-    $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE '_cpiu_%'");
-
-    // Clean up WooCommerce order item meta
-    if (class_exists('WooCommerce')) {
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaDelete, WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-        $wpdb->query("DELETE FROM {$wpdb->prefix}woocommerce_order_itemmeta WHERE meta_key LIKE 'cpiu_%'");
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaDelete, WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-        $wpdb->query("DELETE FROM {$wpdb->prefix}woocommerce_order_itemmeta WHERE meta_key LIKE '_cpiu_%'");
-    }
+    // Remove the scheduled cleanup event, if any remains
+    wp_clear_scheduled_hook('cpiu_cleanup_guest_uploads');
 
     // Clear any cached data for plugin options
     wp_cache_delete('cpiu_settings', 'options');
@@ -81,10 +74,20 @@ function cpiu_enhanced_uninstall()
     wp_cache_delete('cpiu_multi_product_configs', 'options');
     wp_cache_delete('cpiu_keep_data_on_uninstall', 'options');
 
-    // Note: We intentionally do NOT delete uploaded files as they might be referenced in orders
-    // This is a safer approach for e-commerce plugins to maintain data integrity
+    // Note: We intentionally do NOT delete uploaded files, order item meta, or
+    // post meta referencing uploads. Orders must keep their upload references
+    // for data integrity ("Uploaded images referenced in orders will be
+    // preserved"), and the files they point to must remain readable.
 }
 
-// Run the enhanced uninstall function
-cpiu_enhanced_uninstall();
-
+// Run the uninstall routine on every site when network-uninstalled on multisite.
+if (is_multisite()) {
+    $cpiu_site_ids = get_sites(array('fields' => 'ids', 'number' => 0));
+    foreach ($cpiu_site_ids as $cpiu_site_id) {
+        switch_to_blog($cpiu_site_id);
+        cpiu_enhanced_uninstall();
+        restore_current_blog();
+    }
+} else {
+    cpiu_enhanced_uninstall();
+}

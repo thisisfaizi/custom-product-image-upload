@@ -1,4 +1,4 @@
-=== Custom Product Image Upload ===
+=== NDV Product Image Upload for WooCommerce ===
 Contributors: nowdigiverse
 Tags: woocommerce, image upload, product customization, cropping, file upload
 Requires at least: 5.9
@@ -12,7 +12,7 @@ Let WooCommerce customers upload and crop images and PDFs on product pages befor
 
 == Description ==
 
-Custom Product Image Upload lets both logged-in customers and guests upload and crop custom images (and PDFs) for specific WooCommerce products before adding them to the cart. It is ideal for personalised products, custom prints, photo gifts, and any store where customers supply their own artwork.
+NDV Product Image Upload for WooCommerce lets both logged-in customers and guests upload and crop custom images (and PDFs) for specific WooCommerce products before adding them to the cart. It is ideal for personalised products, custom prints, photo gifts, and any store where customers supply their own artwork.
 
 Everything is configured per product, so each product can have its own required file count, file-size limit, allowed file types, button styling, and cropping rules.
 
@@ -51,10 +51,10 @@ The Pro add-on requires this free plugin and is available from the developer at 
 
 == Installation ==
 
-1. Upload the plugin files to `/wp-content/plugins/custom-product-image-upload`, or install through the WordPress Plugins screen.
+1. Upload the plugin files to `/wp-content/plugins/nowdigiverse-product-image-upload`, or install through the WordPress Plugins screen.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 3. Ensure WooCommerce is installed and active.
-4. Go to **Custom Image Upload** in the admin menu and configure a product under "Add Configuration".
+4. Go to **NDV Image Upload** in the admin menu and configure a product under "Add Configuration".
 
 == Frequently Asked Questions ==
 
@@ -98,7 +98,7 @@ You choose. On the "Uninstall Preferences" tab you can keep all data (default) o
 
 = 1.0.0 =
 * Initial WordPress.org release.
-* Per-product image/PDF upload with cropping (shapes and aspect ratios).
+* Per-product image/PDF upload with a built-in cropper (shapes, aspect ratios, zoom/rotate/flip).
 * Guest and logged-in uploads with secure, validated file handling.
 * Resolution validation, default settings, and global controls (express-checkout hiding, order-image auto-cleanup).
 * HPOS compatibility and uninstall data preferences.
@@ -112,7 +112,10 @@ Initial WordPress.org release.
 
 This plugin does not send any data to third parties. Uploaded files are stored on your own server. For guests, a temporary session identifier is created to manage uploads; it is cleaned up when sessions expire or orders complete.
 
+During an upload request the visitor's IP address is read from the server and used transiently for rate limiting (a short cooldown between consecutive guest requests). It is not stored permanently and never leaves your server.
+
 == Credits ==
 
-* Cropper.js for image cropping
+* [Cropper.js](https://github.com/fengyuanchen/cropperjs) (MIT) for image cropping
+* [Select2](https://github.com/select2/select2) (MIT) for the admin product search field
 * WooCommerce for the e-commerce framework

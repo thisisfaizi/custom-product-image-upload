@@ -26,7 +26,7 @@ class CPIU_Frontend_Manager
      */
     public function __construct()
     {
-        $this->data_manager = new CPIU_Data_Manager();
+        $this->data_manager = CPIU_Data_Manager::instance();
         $this->init_hooks();
         $this->init_blocks_support();
     }
@@ -47,6 +47,9 @@ class CPIU_Frontend_Manager
 
         // Register blocks integration for cart item data
         add_action('init', array($this, 'register_blocks_cart_integration'));
+
+        // Cart data for blocks — enqueued inline via wp_enqueue_scripts
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_cart_data_for_blocks'), 20);
     }
 
     /**
@@ -81,14 +84,12 @@ class CPIU_Frontend_Manager
         // Register Store API extension for cart items with multiple compatibility checks
         $this->register_store_api_integration();
 
-        // Use cart item name hook instead to avoid colon formatting
-        add_filter('woocommerce_cart_item_name', array($this, 'add_upload_confirmation_to_cart_item_name'), 10, 3);
-
         // Additional hook for WooCommerce Blocks
+        // (woocommerce_cart_item_name is registered once in init_hooks())
         add_filter('woocommerce_blocks_cart_item_data', array($this, 'blocks_cart_item_data'), 10, 3);
 
-        // Enhanced blocks integration with multiple fallbacks
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_enhanced_blocks_scripts'));
+        // The thumbnail renderer + cart data are enqueued once in
+        // enqueue_cart_data_for_blocks() (hooked in init_blocks_support()).
     }
 
     /**
@@ -127,8 +128,7 @@ class CPIU_Frontend_Manager
             }
         }
 
-        // Method 3: Enhanced JavaScript-based fallback
-        add_action('wp_footer', array($this, 'output_cart_data_for_blocks'));
+        // Cart data is now delivered via wp_add_inline_script() in enqueue_cart_data_for_blocks().
     }
 
     /**
@@ -141,55 +141,135 @@ class CPIU_Frontend_Manager
     }
 
     /**
-     * Output cart data directly for JavaScript consumption
+     * Build the tokenised, public serving URL for an uploaded file.
+     *
+     * @param string $image_url Stored image URL.
+     * @return string|false Secured URL, or false if the URL is invalid.
      */
-    public function output_cart_data_for_blocks()
+    private function build_secured_file_url($image_url)
     {
-        if (is_cart() || is_checkout()) {
-            $cart_data = array();
-
-            if (WC()->cart && !WC()->cart->is_empty()) {
-                foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
-                    if (isset($cart_item['cpiu_uploaded_images']) && !empty($cart_item['cpiu_uploaded_images'])) {
-                        $cart_data[$cart_item_key] = array(
-                            'has_uploaded_images' => true,
-                            'message' => esc_html__('Your files are uploaded', 'custom-product-image-upload'),
-                            'product_id' => $cart_item['product_id'],
-                            'variation_id' => isset($cart_item['variation_id']) ? $cart_item['variation_id'] : 0
-                        );
-                    }
-                }
-            }
-
-            if (!empty($cart_data)) {
-                echo '<script type="text/javascript">
-                    window.cpiuCartData = ' . wp_json_encode($cart_data) . ';
-                </script>';
-            }
+        if (!filter_var(trim($image_url), FILTER_VALIDATE_URL)) {
+            return false;
         }
+        $filename = wp_basename(wp_parse_url($image_url, PHP_URL_PATH));
+        if (empty($filename)) {
+            return false;
+        }
+        $token = cpiu_generate_public_token($filename);
+        return add_query_arg(
+            array('cpiu_file' => $filename, 'cpiu_token' => $token),
+            home_url('/')
+        );
     }
 
     /**
-     * Enqueue enhanced blocks scripts with fallback support
+     * Collect uploaded-file thumbnail data for every cart item, keyed by product.
+     *
+     * Shared by the block cart/checkout integration. The block editor strips
+     * <img> from cart item_data on the client, so the block cart/checkout
+     * renders thumbnails from this data via cpiu-blocks-integration.js instead.
+     *
+     * @return array
      */
-    public function enqueue_enhanced_blocks_scripts()
+    private function get_cart_upload_render_data()
     {
-        if (is_cart() || is_checkout()) {
+        $cart_data = array();
+
+        if (!function_exists('WC') || !WC()->cart) {
+            return $cart_data;
+        }
+
+        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+            if (empty($cart_item['cpiu_uploaded_images']) || !is_array($cart_item['cpiu_uploaded_images'])) {
+                continue;
+            }
+
+            $files = array();
+            foreach ($cart_item['cpiu_uploaded_images'] as $image_url) {
+                $secured_url = $this->build_secured_file_url($image_url);
+                if (!$secured_url) {
+                    continue;
+                }
+                $filename = wp_basename(wp_parse_url($image_url, PHP_URL_PATH));
+                $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                $files[] = array(
+                    'url'    => $secured_url,
+                    'is_pdf' => ($ext === 'pdf'),
+                );
+            }
+
+            if (empty($files)) {
+                continue;
+            }
+
+            $product_id = isset($cart_item['product_id']) ? absint($cart_item['product_id']) : 0;
+            $variation_id = isset($cart_item['variation_id']) ? absint($cart_item['variation_id']) : 0;
+            $permalink = $product_id ? get_permalink($product_id) : '';
+            $product = $product_id ? wc_get_product($product_id) : null;
+
+            $cart_data[$cart_item_key] = array(
+                'product_id'   => $product_id,
+                'variation_id' => $variation_id,
+                'permalink'    => $permalink ? wp_parse_url($permalink, PHP_URL_PATH) : '',
+                'name'         => $product ? $product->get_name() : '',
+                'heading'      => esc_html__('Uploaded files:', 'nowdigiverse-product-image-upload'),
+                'files'        => $files,
+            );
+        }
+
+        return $cart_data;
+    }
+
+    /**
+     * Enqueue cart data + renderer for block-based cart/checkout.
+     *
+     * Runs on any page that hosts the cart or checkout block (covers block
+     * themes, page builders and shortcode-embedded blocks), plus the classic
+     * WooCommerce cart/checkout pages.
+     */
+    public function enqueue_cart_data_for_blocks()
+    {
+        $has_blocks = (function_exists('has_block') && (has_block('woocommerce/cart') || has_block('woocommerce/checkout')));
+        if (!is_cart() && !is_checkout() && !$has_blocks) {
+            return;
+        }
+
+        if (!WC()->cart || WC()->cart->is_empty()) {
+            return;
+        }
+
+        $cart_data = $this->get_cart_upload_render_data();
+        if (empty($cart_data)) {
+            return;
+        }
+
+        // Make sure the stylesheet (responsive thumbnail grid) is present even
+        // if this page is not the classic cart/checkout.
+        if (!wp_style_is('cpiu-frontend-styles', 'enqueued')) {
+            wp_enqueue_style(
+                'cpiu-frontend-styles',
+                CPIU_PLUGIN_URL . 'assets/css/cpiu-frontend-styles.css',
+                array(),
+                CPIU_VERSION
+            );
+        }
+
+        // Enqueue the DOM renderer (single source of truth for the block handle).
+        if (!wp_script_is('cpiu-blocks-integration', 'enqueued')) {
             wp_enqueue_script(
                 'cpiu-blocks-integration',
-                plugin_dir_url(dirname(__FILE__)) . 'assets/js/cpiu-blocks-integration.js',
-                array('wp-blocks', 'wp-element', 'wp-components', 'wc-settings', 'wc-blocks-data-store'),
-                '1.3.0',
+                CPIU_PLUGIN_URL . 'assets/js/cpiu-blocks-integration.js',
+                array(),
+                CPIU_VERSION,
                 true
             );
-
-            // Pass additional data to JavaScript
-            wp_localize_script('cpiu-blocks-integration', 'cpiuBlocksData', array(
-                'ajaxUrl' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('cpiu_blocks_nonce'),
-                'confirmationMessage' => esc_html__('Your files are uploaded', 'custom-product-image-upload')
-            ));
         }
+
+        wp_add_inline_script(
+            'cpiu-blocks-integration',
+            'window.cpiuCartData = ' . wp_json_encode($cart_data) . ';',
+            'before'
+        );
     }
 
     /**
@@ -201,7 +281,7 @@ class CPIU_Frontend_Manager
             // Return simple confirmation data instead of image URLs
             return array(
                 'has_uploaded_images' => true,
-                'message' => esc_html__('Your files are uploaded', 'custom-product-image-upload')
+                'message' => esc_html__('Your files are uploaded', 'nowdigiverse-product-image-upload')
             );
         }
 
@@ -222,17 +302,17 @@ class CPIU_Frontend_Manager
     {
         return array(
             'type' => 'object',
-            'description' => esc_html__('Uploaded files confirmation for this product', 'custom-product-image-upload'),
+            'description' => esc_html__('Uploaded files confirmation for this product', 'nowdigiverse-product-image-upload'),
             'context' => array('view', 'edit'),
             'readonly' => true,
             'properties' => array(
                 'has_uploaded_images' => array(
                     'type' => 'boolean',
-                    'description' => esc_html__('Whether files are uploaded', 'custom-product-image-upload'),
+                    'description' => esc_html__('Whether files are uploaded', 'nowdigiverse-product-image-upload'),
                 ),
                 'message' => array(
                     'type' => 'string',
-                    'description' => esc_html__('Confirmation message', 'custom-product-image-upload'),
+                    'description' => esc_html__('Confirmation message', 'nowdigiverse-product-image-upload'),
                 ),
             ),
         );
@@ -247,7 +327,7 @@ class CPIU_Frontend_Manager
             // Show checkmark and text instead of images for cart/checkout blocks
             $checkmark_html = '<div class="cpiu-cart-confirmation" style="display: flex; align-items: center; color: #28a745; font-weight: 500;">
                 <span style="margin-right: 8px; font-size: 16px;">✓</span>
-                <span>' . esc_html__('Your files are uploaded', 'custom-product-image-upload') . '</span>
+                <span>' . esc_html__('Your files are uploaded', 'nowdigiverse-product-image-upload') . '</span>
             </div>';
 
             return array(
@@ -268,7 +348,7 @@ class CPIU_Frontend_Manager
     {
         return array(
             'uploaded_images' => array(
-                'description' => esc_html__('Uploaded files for this product', 'custom-product-image-upload'),
+                'description' => esc_html__('Uploaded files for this product', 'nowdigiverse-product-image-upload'),
                 'type' => 'string',
                 'context' => array('view', 'edit'),
                 'readonly' => true,
@@ -297,7 +377,7 @@ class CPIU_Frontend_Manager
 
                         // Ensure raw urls are deleted if Store API copied them over
                         $item->delete_meta_data('cpiu_uploaded_images');
-                        $item->delete_meta_data(esc_html__('Uploaded files', 'custom-product-image-upload'));
+                        $item->delete_meta_data(esc_html__('Uploaded files', 'nowdigiverse-product-image-upload'));
 
                         $uploaded_images_str = implode(', ', $cart_item['cpiu_uploaded_images']);
                         $item->add_meta_data('_cpiu_uploaded_images', $uploaded_images_str, true);
@@ -352,9 +432,6 @@ class CPIU_Frontend_Manager
         add_filter('woocommerce_add_cart_item_data', array($this, 'add_cart_item_data'), 10, 3);
         add_filter('woocommerce_add_cart_item', array($this, 'add_cart_item'), 10, 1);
         add_filter('woocommerce_get_cart_item_from_session', array($this, 'get_cart_item_from_session'), 10, 2);
-
-        // Hide custom order meta
-
     }
 
     /**
@@ -410,15 +487,16 @@ class CPIU_Frontend_Manager
         $has_pdf = in_array('pdf', $allowed_types);
 
         ?>
+        <?php wp_nonce_field('cpiu_add_to_cart', 'cpiu_add_to_cart_nonce'); ?>
         <!-- Upload Modal (Button moved to preview section) -->
         <div id="cpiu-upload-modal" class="cpiu-modal">
             <div class="cpiu-modal-content">
                 <button type="button" id="cpiu-close-upload-modal" class="cpiu-close-btn">&times;</button>
 
-                <h3 class="cpiu-modal-title"><?php esc_html_e('Upload Your files', 'custom-product-image-upload'); ?></h3>
+                <h3 class="cpiu-modal-title"><?php esc_html_e('Upload Your files', 'nowdigiverse-product-image-upload'); ?></h3>
 
                 <div class="custom-image-upload cpiu-container">
-                    <label for="cpiu_custom_images"><?php esc_html_e('Choose files', 'custom-product-image-upload'); ?></label>
+                    <label for="cpiu_custom_images"><?php esc_html_e('Choose files', 'nowdigiverse-product-image-upload'); ?></label>
                     <input type="file" id="cpiu_custom_images" name="cpiu_custom_images[]" multiple
                         accept="<?php echo esc_attr($accept_attr); ?>" data-product-id="<?php echo esc_attr($product_id); ?>"
                         data-max-files="<?php echo esc_attr($image_count); ?>"
@@ -429,7 +507,7 @@ class CPIU_Frontend_Manager
                         <?php
                         printf(
                             /* translators: %1$d: Number of images, %2$s: Max file size, %3$s: Allowed formats */
-                            esc_html__('Please upload exactly %1$d files. Maximum file size: %2$s. Allowed formats: %3$s.', 'custom-product-image-upload'),
+                            esc_html__('Please upload exactly %1$d files. Maximum file size: %2$s. Allowed formats: %3$s.', 'nowdigiverse-product-image-upload'),
                             esc_html($image_count),
                             esc_html(size_format($max_file_size)),
                             esc_html(implode(', ', array_map('strtoupper', $allowed_types)))
@@ -441,19 +519,19 @@ class CPIU_Frontend_Manager
                                 $min_w = !empty($config['min_width']) ? $config['min_width'] : 0;
                                 $min_h = !empty($config['min_height']) ? $config['min_height'] : 0;
                                 /* translators: %1$d: Min width, %2$d: Min height */
-                                $res_text[] = sprintf(esc_html__('Min: %1$d×%2$d px', 'custom-product-image-upload'), $min_w, $min_h);
+                                $res_text[] = sprintf(esc_html__('Min: %1$d×%2$d px', 'nowdigiverse-product-image-upload'), $min_w, $min_h);
                             }
                             if (!empty($config['max_width']) || !empty($config['max_height'])) {
                                 $max_w = !empty($config['max_width']) ? $config['max_width'] : 0;
                                 $max_h = !empty($config['max_height']) ? $config['max_height'] : 0;
                                 /* translators: %1$d: Max width, %2$d: Max height */
-                                $res_text[] = sprintf(esc_html__('Max: %1$d×%2$d px', 'custom-product-image-upload'), $max_w, $max_h);
+                                $res_text[] = sprintf(esc_html__('Max: %1$d×%2$d px', 'nowdigiverse-product-image-upload'), $max_w, $max_h);
                             }
                             if (!empty($res_text)) {
                                 echo '<br>';
                                 printf(
                                     /* translators: %s: Resolution requirements string */
-                                    esc_html__('Required resolution: %s', 'custom-product-image-upload'),
+                                    esc_html__('Required resolution: %s', 'nowdigiverse-product-image-upload'),
                                     esc_html(implode(' | ', $res_text))
                                 );
                             }
@@ -465,8 +543,8 @@ class CPIU_Frontend_Manager
                     </div>
 
                     <p class="cpiu-crop-hint">
-                        <strong><?php esc_html_e('Tip:', 'custom-product-image-upload'); ?></strong>
-                        <?php esc_html_e('You can crop images after selecting them.', 'custom-product-image-upload'); ?>
+                        <strong><?php esc_html_e('Tip:', 'nowdigiverse-product-image-upload'); ?></strong>
+                        <?php esc_html_e('You can crop images after selecting them.', 'nowdigiverse-product-image-upload'); ?>
                     </p>
 
                     <div id="cpiu-error-container" class="cpiu-error-container"></div>
@@ -482,49 +560,30 @@ class CPIU_Frontend_Manager
                     <div class="cpiu-modal-actions">
                         <button type="button" id="cpiu-done-button" class="cpiu-done-btn cpiu-dynamic-bg"
                             data-bg-color="<?php echo esc_attr($button_color); ?>">
-                            <?php esc_html_e('Done', 'custom-product-image-upload'); ?>
+                            <?php esc_html_e('Done', 'nowdigiverse-product-image-upload'); ?>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Cropper Modal -->
-        <div id="cpiu-cropper-modal" class="cpiu-cropper-modal">
-            <div class="cpiu-cropper-modal-content">
-                <h3 class="cpiu-cropper-title"><?php esc_html_e('Crop Image', 'custom-product-image-upload'); ?></h3>
-                <div id="cpiu-cropper-container" class="cpiu-cropper-container">
-                    <?php // phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- JS crop target with empty src; not a media-library attachment. ?>
-                    <img id="cpiu-image-to-crop" src=""
-                        alt="<?php esc_attr_e('Image to crop', 'custom-product-image-upload'); ?>" class="cpiu-image-to-crop" />
-                </div>
-                <div class="cpiu-cropper-actions">
-                    <button type="button" id="cpiu-save-cropped-image"
-                        class="button alt cpiu-save-crop-btn"><?php esc_html_e('Save Crop', 'custom-product-image-upload'); ?></button>
-                    <button type="button" id="cpiu-close-cropper-modal"
-                        class="button"><?php esc_html_e('Cancel', 'custom-product-image-upload'); ?></button>
-                </div>
-            </div>
-        </div>
+        <?php // The crop modal is built on demand by assets/js/cpiu-cropper.js (window.CPIUCropper). ?>
 
         <!-- Upload Loading Modal -->
         <div id="cpiu-upload-loading" class="cpiu-upload-loading-modal">
             <div class="cpiu-upload-loading-content">
                 <h3 class="cpiu-upload-loading-title">
-                    <?php esc_html_e('Uploading Your files', 'custom-product-image-upload'); ?>
+                    <?php esc_html_e('Uploading Your files', 'nowdigiverse-product-image-upload'); ?>
                 </h3>
 
-                <!-- Progress Bar -->
-                <div class="cpiu-progress-bar-container"
-                    style="margin: 20px 0; width: 100%; background-color: #f3f3f3; border-radius: 5px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);">
-                    <div class="cpiu-progress-bar"
-                        style="width: 0%; height: 20px; background-color: <?php echo esc_attr($button_color); ?>; border-radius: 5px; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; line-height: 20px; color: white; font-size: 12px; font-weight: bold; position: relative; overflow: hidden;">
-                    </div>
+                <!-- Progress Bar (static styles in cpiu-frontend-styles.css; color applied via the cpiu-dynamic-bg pattern) -->
+                <div class="cpiu-progress-bar-container">
+                    <div class="cpiu-progress-bar cpiu-dynamic-bg" data-bg-color="<?php echo esc_attr($button_color); ?>"></div>
                 </div>
 
                 <div class="cpiu-spinner cpiu-dynamic-border" data-border-color="<?php echo esc_attr($button_color); ?>"></div>
                 <div id="cpiu-upload-status" class="cpiu-upload-status">
-                    <p><?php esc_html_e('Please wait...', 'custom-product-image-upload'); ?></p>
+                    <p><?php esc_html_e('Please wait...', 'nowdigiverse-product-image-upload'); ?></p>
                 </div>
 
             </div>
@@ -575,12 +634,12 @@ class CPIU_Frontend_Manager
         ?>
         <div class="cpiu-image-preview-section">
             <h4 class="cpiu-preview-title">
-                <?php esc_html_e('Your Uploaded files', 'custom-product-image-upload'); ?>
+                <?php esc_html_e('Your Uploaded files', 'nowdigiverse-product-image-upload'); ?>
             </h4>
 
             <div id="cpiu-image-preview-external" class="cpiu-image-preview-external">
                 <div class="cpiu-no-images-message">
-                    <?php esc_html_e('No files uploaded yet.', 'custom-product-image-upload'); ?>
+                    <?php esc_html_e('No files uploaded yet.', 'nowdigiverse-product-image-upload'); ?>
                 </div>
             </div>
 
@@ -609,11 +668,6 @@ class CPIU_Frontend_Manager
     {
         global $post;
 
-        // Load on product pages, cart, and checkout
-        if (!is_product() && !is_cart() && !is_checkout() && !isset($post)) {
-            return;
-        }
-
         // For cart and checkout pages, only enqueue styles
         if (is_cart() || is_checkout()) {
             wp_enqueue_style(
@@ -636,6 +690,11 @@ class CPIU_Frontend_Manager
             return;
         }
 
+        // Beyond cart/checkout, assets are only needed on single product pages.
+        if (!is_product() || !isset($post)) {
+            return;
+        }
+
         $product_id = $post->ID;
         $product = wc_get_product($product_id);
 
@@ -654,7 +713,7 @@ class CPIU_Frontend_Manager
         wp_enqueue_script(
             'cpiu-frontend-multi-product',
             CPIU_PLUGIN_URL . 'assets/js/cpiu-frontend-multi-product.js',
-            array('jquery'),
+            array('jquery', 'cropper-js', 'cpiu-cropper'),
             CPIU_VERSION,
             true
         );
@@ -689,69 +748,90 @@ class CPIU_Frontend_Manager
             'max_height' => $config['max_height'],
             'error_less_images' => sprintf(
                 /* translators: %1$d: Number of images */
-                esc_html__('Please upload exactly %1$d files to proceed.', 'custom-product-image-upload'),
+                esc_html__('Please upload exactly %1$d files to proceed.', 'nowdigiverse-product-image-upload'),
                 $config['image_count']
             ),
             'error_more_images' => sprintf(
                 /* translators: %1$d: Number of images */
-                esc_html__('You can only upload %1$d files. Please remove the extra files.', 'custom-product-image-upload'),
+                esc_html__('You can only upload %1$d files. Please remove the extra files.', 'nowdigiverse-product-image-upload'),
                 $config['image_count']
             ),
             'error_file_size' => sprintf(
                 /* translators: %1$s: File size */
-                esc_html__('File "{filename}" exceeds the maximum allowed size of %1$s.', 'custom-product-image-upload'),
+                esc_html__('File "{filename}" exceeds the maximum allowed size of %1$s.', 'nowdigiverse-product-image-upload'),
                 size_format($config['max_file_size'])
             ),
             'error_file_type' => sprintf(
                 /* translators: %1$s: Allowed file types */
-                esc_html__('File "{filename}" type not allowed. Allowed types: %1$s.', 'custom-product-image-upload'),
+                esc_html__('File "{filename}" type not allowed. Allowed types: %1$s.', 'nowdigiverse-product-image-upload'),
                 implode(', ', array_map('strtoupper', $config['allowed_types']))
             ),
-            'error_resolution_min_width' => esc_html__('Image "{filename}" width ({width}px) is below minimum required width ({min_width}px).', 'custom-product-image-upload'),
-            'error_resolution_min_height' => esc_html__('Image "{filename}" height ({height}px) is below minimum required height ({min_height}px).', 'custom-product-image-upload'),
-            'error_resolution_max_width' => esc_html__('Image "{filename}" width ({width}px) exceeds maximum allowed width ({max_width}px).', 'custom-product-image-upload'),
-            'error_resolution_max_height' => esc_html__('Image "{filename}" height ({height}px) exceeds maximum allowed height ({max_height}px).', 'custom-product-image-upload'),
-            'text_loading' => esc_html__('Reading files...', 'custom-product-image-upload'),
-            'text_loading_file' => esc_html__('Reading {filename}...', 'custom-product-image-upload'),
-            'text_loaded_progress' => esc_html__('Read {loaded} of {total} files ({percent}%)', 'custom-product-image-upload'),
-            'text_error_loading' => esc_html__('Error reading file: {filename}', 'custom-product-image-upload'),
-            'text_skipped_file' => esc_html__('Skipped non-image file: {filename}', 'custom-product-image-upload'),
-            'text_ajax_starting' => esc_html__('Uploading files...', 'custom-product-image-upload'),
-            'text_ajax_preparing' => esc_html__('Preparing files...', 'custom-product-image-upload'),
-            'text_ajax_uploading' => esc_html__('Processing files... {percent}%', 'custom-product-image-upload'),
-            'text_ajax_complete' => esc_html__('files Uploaded! Adding to cart...', 'custom-product-image-upload'),
-            'text_ajax_error' => esc_html__('Error Uploading files: {message}', 'custom-product-image-upload'),
-            'text_ajax_status_error' => esc_html__('Server error during Uploading. Status: {status}', 'custom-product-image-upload'),
-            'text_ajax_network_error' => esc_html__('Network error during Uploading.', 'custom-product-image-upload'),
+            'error_resolution_min_width' => esc_html__('Image "{filename}" width ({width}px) is below minimum required width ({min_width}px).', 'nowdigiverse-product-image-upload'),
+            'error_resolution_min_height' => esc_html__('Image "{filename}" height ({height}px) is below minimum required height ({min_height}px).', 'nowdigiverse-product-image-upload'),
+            'error_resolution_max_width' => esc_html__('Image "{filename}" width ({width}px) exceeds maximum allowed width ({max_width}px).', 'nowdigiverse-product-image-upload'),
+            'error_resolution_max_height' => esc_html__('Image "{filename}" height ({height}px) exceeds maximum allowed height ({max_height}px).', 'nowdigiverse-product-image-upload'),
+            'text_loading' => esc_html__('Reading files...', 'nowdigiverse-product-image-upload'),
+            'text_loading_file' => esc_html__('Reading {filename}...', 'nowdigiverse-product-image-upload'),
+            'text_loaded_progress' => esc_html__('Read {loaded} of {total} files ({percent}%)', 'nowdigiverse-product-image-upload'),
+            'text_error_loading' => esc_html__('Error reading file: {filename}', 'nowdigiverse-product-image-upload'),
+            'text_skipped_file' => esc_html__('Skipped non-image file: {filename}', 'nowdigiverse-product-image-upload'),
+            'text_ajax_starting' => esc_html__('Uploading files...', 'nowdigiverse-product-image-upload'),
+            'text_ajax_preparing' => esc_html__('Preparing files...', 'nowdigiverse-product-image-upload'),
+            'text_ajax_uploading' => esc_html__('Processing files... {percent}%', 'nowdigiverse-product-image-upload'),
+            'text_ajax_complete' => esc_html__('files Uploaded! Adding to cart...', 'nowdigiverse-product-image-upload'),
+            'text_ajax_error' => esc_html__('Error Uploading files: {message}', 'nowdigiverse-product-image-upload'),
+            'text_ajax_status_error' => esc_html__('Server error during Uploading. Status: {status}', 'nowdigiverse-product-image-upload'),
+            'text_ajax_network_error' => esc_html__('Network error during Uploading.', 'nowdigiverse-product-image-upload'),
             // Enhanced progress messages
-            'text_progress_preparing' => esc_html__('Preparing files for upload...', 'custom-product-image-upload'),
-            'text_progress_processing' => esc_html__('Processing {count} file{plural}...', 'custom-product-image-upload'),
-            'text_progress_uploading' => esc_html__('Uploading files to server...', 'custom-product-image-upload'),
-            'text_progress_server_processing' => esc_html__('Processing server response...', 'custom-product-image-upload'),
-            'text_progress_finalizing' => esc_html__('Finalizing upload...', 'custom-product-image-upload'),
-            'text_progress_complete' => esc_html__('Upload complete! Redirecting to cart...', 'custom-product-image-upload'),
-            'text_progress_error' => esc_html__('Error: {message}', 'custom-product-image-upload'),
-            'text_progress_network_error' => esc_html__('Network error: {message}', 'custom-product-image-upload'),
-            'text_no_images' => esc_html__('No Files uploaded yet. Click "button" above to add your files.', 'custom-product-image-upload'),
-            'text_click_to_crop' => esc_html__('Click to crop', 'custom-product-image-upload'),
-            'text_click_to_crop_hint' => esc_html__('Click on an image to crop it if needed.', 'custom-product-image-upload'),
-            'text_delete_image' => esc_html__('Delete image', 'custom-product-image-upload'),
-            'text_crop_error' => esc_html__('Could not crop image.', 'custom-product-image-upload'),
-            'text_unknown_error' => esc_html__('Unknown server error.', 'custom-product-image-upload'),
-            'text_resolution_error' => esc_html__('Could not load image for resolution validation.', 'custom-product-image-upload'),
+            'text_progress_preparing' => esc_html__('Preparing files for upload...', 'nowdigiverse-product-image-upload'),
+            'text_progress_processing' => esc_html__('Processing {count} file{plural}...', 'nowdigiverse-product-image-upload'),
+            'text_progress_uploading' => esc_html__('Uploading files to server...', 'nowdigiverse-product-image-upload'),
+            'text_progress_server_processing' => esc_html__('Processing server response...', 'nowdigiverse-product-image-upload'),
+            'text_progress_finalizing' => esc_html__('Finalizing upload...', 'nowdigiverse-product-image-upload'),
+            'text_progress_complete' => esc_html__('Upload complete! Redirecting to cart...', 'nowdigiverse-product-image-upload'),
+            'text_progress_error' => esc_html__('Error: {message}', 'nowdigiverse-product-image-upload'),
+            'text_progress_network_error' => esc_html__('Network error: {message}', 'nowdigiverse-product-image-upload'),
+            'text_no_images' => esc_html__('No Files uploaded yet. Click "button" above to add your files.', 'nowdigiverse-product-image-upload'),
+            'text_click_to_crop' => esc_html__('Click to crop', 'nowdigiverse-product-image-upload'),
+            'text_click_to_crop_hint' => esc_html__('Click on an image to crop it if needed.', 'nowdigiverse-product-image-upload'),
+            'text_delete_image' => esc_html__('Delete image', 'nowdigiverse-product-image-upload'),
+            'text_crop_error' => esc_html__('Could not crop image.', 'nowdigiverse-product-image-upload'),
+            'text_unknown_error' => esc_html__('Unknown server error.', 'nowdigiverse-product-image-upload'),
+            'text_resolution_error' => esc_html__('Could not load image for resolution validation.', 'nowdigiverse-product-image-upload'),
             'cart_url' => wc_get_cart_url(),
             // Shape validation settings
             'shape_validation_enabled' => !empty($config['shape_validation_enabled']),
             'shape_requirements' => isset($config['shape_requirements']) ? $config['shape_requirements'] : array(),
             'enable_shape_cropping' => $config['enable_shape_cropping'],
             'cropping_ratio' => $config['cropping_ratio'],
-            'text_shape_required' => esc_html__('Please upload {count} image(s) for {shape}.', 'custom-product-image-upload'),
-            'text_shape_missing' => esc_html__('Missing images for shape: {shape}', 'custom-product-image-upload'),
+            // Cropper module UI strings (assets/js/cpiu-cropper.js).
+            'cropper_i18n' => array(
+                'crop_title'   => esc_html__('Crop Image', 'nowdigiverse-product-image-upload'),
+                'select_shape' => esc_html__('Select Shape:', 'nowdigiverse-product-image-upload'),
+                'shape_none'      => esc_html__('None', 'nowdigiverse-product-image-upload'),
+                'shape_square'    => esc_html__('Square', 'nowdigiverse-product-image-upload'),
+                'shape_rectangle' => esc_html__('Rectangle', 'nowdigiverse-product-image-upload'),
+                'shape_circle'    => esc_html__('Circle', 'nowdigiverse-product-image-upload'),
+                'shape_heart'     => esc_html__('Heart', 'nowdigiverse-product-image-upload'),
+                'save_crop' => esc_html__('Save Crop', 'nowdigiverse-product-image-upload'),
+                'cancel'    => esc_html__('Cancel', 'nowdigiverse-product-image-upload'),
+                'restore'   => esc_html__('Restore Original', 'nowdigiverse-product-image-upload'),
+                'zoom_in'      => esc_html__('Zoom in', 'nowdigiverse-product-image-upload'),
+                'zoom_out'     => esc_html__('Zoom out', 'nowdigiverse-product-image-upload'),
+                'rotate_left'  => esc_html__('Rotate left', 'nowdigiverse-product-image-upload'),
+                'rotate_right' => esc_html__('Rotate right', 'nowdigiverse-product-image-upload'),
+                'flip_h'       => esc_html__('Flip horizontal', 'nowdigiverse-product-image-upload'),
+                'flip_v'       => esc_html__('Flip vertical', 'nowdigiverse-product-image-upload'),
+                'reset'        => esc_html__('Reset', 'nowdigiverse-product-image-upload'),
+                'crop_error'   => esc_html__('Could not crop image.', 'nowdigiverse-product-image-upload'),
+            ),
+            'text_shape_required' => esc_html__('Please upload {count} image(s) for {shape}.', 'nowdigiverse-product-image-upload'),
+            'text_shape_missing' => esc_html__('Missing images for shape: {shape}', 'nowdigiverse-product-image-upload'),
             // PDF support
             'has_pdf' => in_array('pdf', $config['allowed_types']),
             'pdf_upload_action' => 'cpiu_upload_pdf_files',
-            'error_pdf_type' => esc_html__('File "{filename}" is not allowed. Please upload only the accepted file types.', 'custom-product-image-upload'),
-            'text_pdf_no_crop' => esc_html__('PDF files cannot be cropped.', 'custom-product-image-upload'),
+            'error_pdf_type' => esc_html__('File "{filename}" is not allowed. Please upload only the accepted file types.', 'nowdigiverse-product-image-upload'),
+            'text_pdf_no_crop' => esc_html__('PDF files cannot be cropped.', 'nowdigiverse-product-image-upload'),
         );
 
         wp_localize_script('cpiu-frontend-multi-product', 'cpiu_params', $script_data);
@@ -782,8 +862,22 @@ class CPIU_Frontend_Manager
             return;
         }
 
-        wp_enqueue_script('cropper-js', CPIU_PLUGIN_URL . 'assets/js/cropper.min.js', array(), '1.6.1', true);
-        wp_enqueue_style('cropper-css', CPIU_PLUGIN_URL . 'assets/css/cropper.min.css', array(), '1.6.1');
+        wp_enqueue_script('cropper-js', CPIU_PLUGIN_URL . 'assets/js/cropper.min.js', array(), '2.1.1', true);
+
+        // Self-contained cropper module (builds its own modal + toolbar).
+        wp_enqueue_script(
+            'cpiu-cropper',
+            CPIU_PLUGIN_URL . 'assets/js/cpiu-cropper.js',
+            array('cropper-js'),
+            CPIU_VERSION,
+            true
+        );
+        wp_enqueue_style(
+            'cpiu-cropper',
+            CPIU_PLUGIN_URL . 'assets/css/cpiu-cropper.css',
+            array(),
+            CPIU_VERSION
+        );
     }
 
     /**
@@ -794,26 +888,28 @@ class CPIU_Frontend_Manager
         if (isset($cart_item['cpiu_uploaded_images']) && is_array($cart_item['cpiu_uploaded_images'])) {
 
 
+            // Layout lives in cpiu-frontend-styles.css (.cpiu-cart-thumbnails
+            // responsive grid) — the stylesheet is enqueued on cart/checkout.
             $image_html = '<div class="cpiu-cart-thumbnails">';
             foreach ($cart_item['cpiu_uploaded_images'] as $image_url) {
                 if (filter_var(trim($image_url), FILTER_VALIDATE_URL)) {
                     $filename = basename(wp_parse_url($image_url, PHP_URL_PATH));
                     $token = cpiu_generate_public_token($filename);
-                    $secured_url = home_url('?cpiu_file=' . urlencode($filename) . '&cpiu_nonce=' . wp_create_nonce('cpiu_serve_file') . '&cpiu_token=' . $token);
+                    $secured_url = home_url('?cpiu_file=' . urlencode($filename) . '&cpiu_token=' . $token);
                     $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
                     if ($ext === 'pdf') {
-                        $image_html .= '<div class="cpiu-order-image-container cpiu-pdf-icon-container" style="display:flex; align-items:center; justify-content:center; background:#f0f0f1; border-radius:4px; width:60px; height:60px;"><span style="font-size:32px;">📄</span></div>';
+                        $image_html .= '<div class="cpiu-order-image-container cpiu-pdf-icon-container"><span>📄</span></div>';
                     } else {
                         // phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Customer-uploaded file served via HMAC token URL, not a media-library attachment.
-                        $image_html .= '<div class="cpiu-order-image-container"><img src="' . esc_url($secured_url) . '" alt="' . esc_attr__('Uploaded image', 'custom-product-image-upload') . '" class="cpiu-order-image" style="width:60px; height:60px; object-fit:cover; border-radius:4px;" /></div>';
+                        $image_html .= '<div class="cpiu-order-image-container"><img src="' . esc_url($secured_url) . '" alt="' . esc_attr__('Uploaded image', 'nowdigiverse-product-image-upload') . '" class="cpiu-order-image" loading="lazy" /></div>';
                     }
                 }
             }
             $image_html .= '</div>';
 
             $item_data['uploaded_images'] = array(
-                'key' => esc_html__('Uploaded files', 'custom-product-image-upload'),
+                'key' => esc_html__('Uploaded files', 'nowdigiverse-product-image-upload'),
                 'value' => $image_html,
                 'display' => $image_html
             );
@@ -828,28 +924,36 @@ class CPIU_Frontend_Manager
     public function display_uploaded_images_in_cart($item_data, $cart_item)
     {
         if (isset($cart_item['cpiu_uploaded_images']) && is_array($cart_item['cpiu_uploaded_images'])) {
-            $image_html = '<div class="cpiu-cart-images-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px;">';
+            // Layout lives in cpiu-frontend-styles.css (.cpiu-cart-images-container
+            // responsive grid) — the stylesheet is enqueued on cart/checkout.
+            $image_html = '<div class="cpiu-cart-images-container">';
             foreach ($cart_item['cpiu_uploaded_images'] as $image_url) {
                 if (filter_var(trim($image_url), FILTER_VALIDATE_URL)) {
                     $filename = basename(wp_parse_url($image_url, PHP_URL_PATH));
                     $token = cpiu_generate_public_token($filename);
-                    $secured_url = home_url('?cpiu_file=' . urlencode($filename) . '&cpiu_nonce=' . wp_create_nonce('cpiu_serve_file') . '&cpiu_token=' . $token);
+                    $secured_url = home_url('?cpiu_file=' . urlencode($filename) . '&cpiu_token=' . $token);
                     $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
                     if ($ext === 'pdf') {
-                        $image_html .= '<div class="cpiu-cart-pdf-icon" style="background: #f0f0f1; border: 1px solid #ddd; border-radius: 4px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 24px;" title="' . esc_attr($filename) . '">📄</div>';
+                        $image_html .= '<div class="cpiu-cart-pdf-icon" title="' . esc_attr($filename) . '">📄</div>';
                     } else {
                         // phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Customer-uploaded file served via HMAC token URL, not a media-library attachment.
-                        $image_html .= '<img src="' . esc_url($secured_url) . '" alt="' . esc_attr__('Uploaded image', 'custom-product-image-upload') . '" style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px; display: block;" />';
+                        $image_html .= '<img src="' . esc_url($secured_url) . '" alt="' . esc_attr__('Uploaded image', 'nowdigiverse-product-image-upload') . '" class="cpiu-cart-thumb" loading="lazy" />';
                     }
                 }
             }
             $image_html .= '</div>';
 
             $item_data[] = array(
-                'key' => esc_html__('Uploaded files', 'custom-product-image-upload'),
+                'key' => esc_html__('Uploaded files', 'nowdigiverse-product-image-upload'),
                 'value' => $image_html,
-                'display' => $image_html
+                'display' => $image_html,
+                // The block cart/checkout strips <img> from item_data on the
+                // client, which would leave a bare "Uploaded files:" label. Hide
+                // this entry there; the block renderer (cpiu-blocks-integration.js)
+                // draws real thumbnails instead. The classic cart ignores this key
+                // and still shows the image grid above.
+                '__experimental_woocommerce_blocks_hidden' => true,
             );
         }
 
@@ -867,19 +971,22 @@ class CPIU_Frontend_Manager
      */
     public function add_cart_item_data($cart_item_data, $product_id, $variation_id)
     {
-        // Check for image data in the POST request.
-        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Runs inside WooCommerce's add-to-cart request (woocommerce_add_cart_item_data), which WooCommerce nonce-protects; values are sanitized below with esc_url_raw()/absint().
-        if (isset($_POST['cpiu_uploaded_images']) && is_array($_POST['cpiu_uploaded_images'])) {
-            $cart_item_data['cpiu_uploaded_images'] = array_map('esc_url_raw', wp_unslash($_POST['cpiu_uploaded_images']));
-
-            // Store variation_id alongside the image data
-            if ($variation_id > 0) {
-                $cart_item_data['cpiu_variation_id'] = $variation_id;
-            } elseif (isset($_POST['variation_id'])) {
-                $cart_item_data['cpiu_variation_id'] = absint($_POST['variation_id']);
-            }
+        if (!isset($_POST['cpiu_uploaded_images']) || !is_array($_POST['cpiu_uploaded_images'])) {
+            return $cart_item_data;
         }
-        // phpcs:enable WordPress.Security.NonceVerification.Missing
+
+        // Verify our nonce before accepting upload data.
+        if (!isset($_POST['cpiu_add_to_cart_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['cpiu_add_to_cart_nonce'])), 'cpiu_add_to_cart')) {
+            return $cart_item_data;
+        }
+
+        $cart_item_data['cpiu_uploaded_images'] = array_map('esc_url_raw', wp_unslash($_POST['cpiu_uploaded_images']));
+
+        if ($variation_id > 0) {
+            $cart_item_data['cpiu_variation_id'] = $variation_id;
+        } elseif (isset($_POST['variation_id'])) {
+            $cart_item_data['cpiu_variation_id'] = absint($_POST['variation_id']);
+        }
 
         return $cart_item_data;
     }
@@ -929,7 +1036,7 @@ class CPIU_Frontend_Manager
         if (isset($cart_item['cpiu_uploaded_images']) && is_array($cart_item['cpiu_uploaded_images']) && !empty($cart_item['cpiu_uploaded_images'])) {
             // Add checkmark and text after the product name
             $checkmark_html = '<div class="cpiu-cart-confirmation" style="margin-top: 5px; color: #28a745; font-weight: 500;">
-                <span style="margin-right: 6px; font-size: 16px; vertical-align: middle;">✓</span><span style="vertical-align: middle;">' . esc_html__('Your files are uploaded', 'custom-product-image-upload') . '</span>
+                <span style="margin-right: 6px; font-size: 16px; vertical-align: middle;">✓</span><span style="vertical-align: middle;">' . esc_html__('Your files are uploaded', 'nowdigiverse-product-image-upload') . '</span>
             </div>';
 
             $product_name .= $checkmark_html;
@@ -945,7 +1052,7 @@ class CPIU_Frontend_Manager
         if (isset($values['cpiu_uploaded_images']) && is_array($values['cpiu_uploaded_images'])) {
             // Remove the visible 'cpiu_uploaded_images' meta added auto-magically by WooCommerce 
             $item->delete_meta_data('cpiu_uploaded_images');
-            $item->delete_meta_data(esc_html__('Uploaded files', 'custom-product-image-upload'));
+            $item->delete_meta_data(esc_html__('Uploaded files', 'nowdigiverse-product-image-upload'));
 
             $uploaded_images_str = implode(', ', $values['cpiu_uploaded_images']);
             $item->add_meta_data('_cpiu_uploaded_images', $uploaded_images_str, true);
@@ -970,9 +1077,14 @@ class CPIU_Frontend_Manager
         $uploaded_images_str = $item->get_meta('_cpiu_uploaded_images');
 
         if ($uploaded_images_str) {
+            // NOTE: This markup intentionally uses inline styles. It renders via
+            // woocommerce_order_item_meta_end, which also runs inside WooCommerce
+            // ORDER EMAILS where enqueued stylesheets never load. Do not move
+            // these styles to the stylesheet. The grid uses auto-fill/minmax so
+            // it stays responsive without media queries.
             echo '<div class="cpiu-order-item-images-wrapper" style="margin-top: 15px; clear: both;">';
-            echo '<strong class="cpiu-order-images-title" style="display: block; margin-bottom: 10px; font-size: 14px; color: #333;">' . esc_html__('Uploaded Files:', 'custom-product-image-upload') . '</strong>';
-            echo '<div class="cpiu-order-item-images" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;">';
+            echo '<strong class="cpiu-order-images-title" style="display: block; margin-bottom: 10px; font-size: 14px; color: #333;">' . esc_html__('Uploaded Files:', 'nowdigiverse-product-image-upload') . '</strong>';
+            echo '<div class="cpiu-order-item-images" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; align-items: start; max-width: 560px;">';
 
             $images = explode(', ', $uploaded_images_str);
             $original_names_str = $item->get_meta('_cpiu_original_filenames');
@@ -986,38 +1098,37 @@ class CPIU_Frontend_Manager
 
                     $secured_url = add_query_arg(array(
                         'cpiu_file' => $filename,
-                        'cpiu_nonce' => wp_create_nonce('cpiu_serve_file'),
                         'cpiu_token' => $token
                     ), home_url('/'));
 
                     $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
                     $display_name = isset($original_names[$index]) ? $original_names[$index] : $filename;
+                    $download_url = add_query_arg('download', '1', $secured_url);
 
+                    // Uniform card for each uploaded file (image thumbnail or PDF icon).
+                    // width:100% fills the responsive grid cell; max-width keeps it card-sized
+                    // in non-grid contexts such as email clients.
+                    echo '<div class="cpiu-order-file-card" style="width: 100%; max-width: 140px; display: flex; flex-direction: column; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">';
+
+                    echo '<a href="' . esc_url($secured_url) . '" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; aspect-ratio: 1 / 1; text-decoration: none;">';
                     if ($ext === 'pdf') {
-                        echo '<div class="cpiu-order-pdf-container" style="width: 100px; text-align: center; display: flex; flex-direction: column; align-items: center;">';
-                        echo '<a href="' . esc_url($secured_url) . '" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 6px;">';
-                        echo '<div style="background: #fdfdfd; border: 1px solid #e5e5e5; border-radius: 6px; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">📄</div>';
-                        echo '<span style="font-size: 11px; width: 100%; word-break: break-all; color: #444; line-height: 1.3; font-weight: 500;">' . esc_html($display_name) . '</span>';
-                        echo '</a>';
-                        echo '<a href="' . esc_url(add_query_arg('download', '1', $secured_url)) . '" class="cpiu-download-link" style="font-size: 11px; color: #007cba; text-decoration: underline; margin-top: 4px;">' . esc_html__('Download', 'custom-product-image-upload') . '</a>';
-                        echo '</div>';
+                        echo '<span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 96px; background: #f6f7f7; font-size: 40px;" aria-hidden="true">📄</span>';
                     } else {
-                        echo '<div class="cpiu-order-image-container" style="width: 100px; text-align: center; display: flex; flex-direction: column; align-items: center;">';
-                        echo '<a href="' . esc_url($secured_url) . '" target="_blank" rel="noopener noreferrer" style="display: block; width: 100px; height: 100px; margin-bottom: 6px;">';
                         // phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage -- Customer-uploaded file served via HMAC token URL, not a media-library attachment.
-                        echo '<img src="' . esc_url($secured_url) . '" alt="' . esc_attr__('Uploaded Image', 'custom-product-image-upload') . '" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #e5e5e5; border-radius: 6px; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">';
-                        echo '</a>';
-                        echo '<span style="font-size: 11px; width: 100%; word-break: break-all; color: #444; line-height: 1.3; font-weight: 500;">' . esc_html($display_name) . '</span>';
-                        echo '<a href="' . esc_url(add_query_arg('download', '1', $secured_url)) . '" class="cpiu-download-link" style="font-size: 11px; color: #007cba; text-decoration: underline; margin-top: 4px;">' . esc_html__('Download', 'custom-product-image-upload') . '</a>';
-                        echo '</div>';
+                        echo '<img src="' . esc_url($secured_url) . '" alt="' . esc_attr($display_name) . '" loading="lazy" style="width: 100%; height: 100%; min-height: 96px; object-fit: cover; display: block; background: #f6f7f7;">';
                     }
+                    echo '</a>';
+
+                    echo '<div style="padding: 6px 8px; display: flex; flex-direction: column; gap: 5px;">';
+                    echo '<span title="' . esc_attr($display_name) . '" style="font-size: 11px; color: #50575e; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' . esc_html($display_name) . '</span>';
+                    echo '<a href="' . esc_url($download_url) . '" class="cpiu-download-link" style="font-size: 11px; color: #007cba; text-decoration: none; font-weight: 500;">' . esc_html__('Download', 'nowdigiverse-product-image-upload') . '</a>';
+                    echo '</div>';
+
+                    echo '</div>'; // .cpiu-order-file-card
                 }
             }
             echo '</div>'; // .cpiu-order-item-images
             echo '</div>'; // .cpiu-order-item-images-wrapper
-            echo '</div>'; // .cpiu-order-item-images
-            echo '</div>'; // .cpiu-order-item-images-wrapper
-            echo '</div>';
         }
     }
 
@@ -1072,7 +1183,7 @@ class CPIU_Frontend_Manager
         // Product has configuration requirements, disable add to cart on archive pages <mcreference link="https://rudrastyh.com/woocommerce/remove-add-to-cart-button.html" index="2">2</mcreference>
         // Replace with a "View Product" button that links to the product page <mcreference link="https://www.businessbloomer.com/woocommerce-remove-add-cart-add-view-product-loop/" index="3">3</mcreference>
         $product_link = $product->get_permalink();
-        $view_product_text = esc_html__('Add to Cart', 'custom-product-image-upload');
+        $view_product_text = esc_html__('Add to Cart', 'nowdigiverse-product-image-upload');
 
         // Get the original button classes for styling consistency
         $button_classes = 'button product_type_simple add_to_cart_button ajax_add_to_cart cpiu-configure-button';
@@ -1151,9 +1262,5 @@ class CPIU_Frontend_Manager
         add_filter('wcpay_payment_request_is_product_supported', '__return_false');
         add_filter('woocommerce_paypal_payments_product_page_buttons_visible', '__return_false');
         add_filter('woocommerce_paypal_express_checkout_disable_on_product', '__return_true');
-
-        // Disable generic express checkout buttons that hook into 'woocommerce_after_add_to_cart_quantity'
-        // Strategy: Iterate through callbacks? No, hard to know which is which.
-        // Trusted specific filters are the best way.
     }
 }
