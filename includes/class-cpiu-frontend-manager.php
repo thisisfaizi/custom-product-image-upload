@@ -432,6 +432,43 @@ class CPIU_Frontend_Manager
         add_filter('woocommerce_add_cart_item_data', array($this, 'add_cart_item_data'), 10, 3);
         add_filter('woocommerce_add_cart_item', array($this, 'add_cart_item'), 10, 1);
         add_filter('woocommerce_get_cart_item_from_session', array($this, 'get_cart_item_from_session'), 10, 2);
+
+        // Lock the quantity selector to 1 for products/variations configured with disable_quantity.
+        add_filter('woocommerce_is_sold_individually', array($this, 'maybe_disable_quantity'), 10, 2);
+    }
+
+    /**
+     * Force a product to be sold individually when its upload configuration has
+     * "Lock quantity to 1" enabled.
+     *
+     * Never overrides an existing `true` back to false — if the merchant already
+     * marked the product "Sold individually" in WooCommerce's own product data,
+     * or another plugin already locked it, that decision stands.
+     *
+     * @param bool               $sold_individually Current value.
+     * @param WC_Product|mixed $product           Product (or variation) being evaluated.
+     * @return bool
+     */
+    public function maybe_disable_quantity($sold_individually, $product)
+    {
+        if ($sold_individually || !is_object($product) || !method_exists($product, 'get_id')) {
+            return $sold_individually;
+        }
+
+        $parent_id = method_exists($product, 'get_parent_id') ? (int) $product->get_parent_id() : 0;
+        $product_id = $parent_id > 0 ? $parent_id : (int) $product->get_id();
+        $variation_id = $parent_id > 0 ? (int) $product->get_id() : 0;
+
+        // get_frontend_configuration() already resolves variation -> parent fallback
+        // and returns false when uploads are not enabled for this product, which is
+        // exactly when the quantity lock should NOT apply.
+        $config = $this->data_manager->get_frontend_configuration($product_id, $variation_id);
+
+        if (!$config) {
+            return $sold_individually;
+        }
+
+        return !empty($config['disable_quantity']);
     }
 
     /**

@@ -78,6 +78,7 @@ class CPIU_Data_Manager
         'max_height' => 0,
         'enable_shape_cropping' => true,
         'cropping_ratio' => 'free',
+        'disable_quantity' => false,
         'created_at' => '',
         'updated_at' => ''
     );
@@ -97,7 +98,8 @@ class CPIU_Data_Manager
         'max_width' => 0,
         'max_height' => 0,
         'enable_shape_cropping' => true,
-        'cropping_ratio' => 'free'
+        'cropping_ratio' => 'free',
+        'disable_quantity' => false
     );
 
     /**
@@ -211,6 +213,7 @@ class CPIU_Data_Manager
             'enable_shape_cropping' => isset($raw['enable_shape_cropping']) ? (bool) $raw['enable_shape_cropping'] : true,
             'cropping_ratio' => $this->sanitize_cropping_ratio($raw['cropping_ratio'] ?? 'free'),
             'allowed_types' => $this->sanitize_allowed_types($raw['allowed_types'] ?? array()),
+            'disable_quantity' => !empty($raw['disable_quantity']),
         );
 
         return wp_parse_args($sanitized, $this->default_settings);
@@ -712,6 +715,10 @@ class CPIU_Data_Manager
         // Sanitize Cropping Ratio (shared helper)
         $sanitized['cropping_ratio'] = $this->sanitize_cropping_ratio($config['cropping_ratio'] ?? 'free');
 
+        // Lock the WooCommerce quantity selector to 1 for this product/variation.
+        // Enforced via the woocommerce_is_sold_individually filter in CPIU_Frontend_Manager.
+        $sanitized['disable_quantity'] = !empty($config['disable_quantity']);
+
         // Merge with defaults so any missing fields (including enabled) get defaults (enabled=true)
         $sanitized = wp_parse_args($sanitized, $this->default_config);
 
@@ -764,7 +771,8 @@ class CPIU_Data_Manager
             'max_width' => $config['max_width'],
             'max_height' => $config['max_height'],
             'enable_shape_cropping' => $config['enable_shape_cropping'],
-            'cropping_ratio' => $config['cropping_ratio']
+            'cropping_ratio' => $config['cropping_ratio'],
+            'disable_quantity' => $config['disable_quantity']
         );
     }
 }

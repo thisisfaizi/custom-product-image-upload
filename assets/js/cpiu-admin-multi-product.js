@@ -320,6 +320,7 @@ jQuery(document).ready(function ($) {
         formData.set('settings[enable_shape_cropping]', form.find('input[name="enable_shape_cropping"]').is(':checked') ? 1 : 0);
         formData.set('settings[cropping_ratio]', form.find('select[name="cropping_ratio"]').val());
         formData.set('settings[cropping_ratio]', form.find('select[name="cropping_ratio"]').val());
+        formData.set('settings[disable_quantity]', form.find('input[name="disable_quantity"]').is(':checked') ? 1 : 0);
 
         $.ajax({
             url: cpiu_admin.ajax_url,
@@ -390,6 +391,7 @@ jQuery(document).ready(function ($) {
         formData.set('config[max_height]', form.find('input[name="max_height"]').val() || 0);
         formData.set('config[enable_shape_cropping]', form.find('input[name="enable_shape_cropping"]').is(':checked') ? 1 : 0);
         formData.set('config[cropping_ratio]', form.find('select[name="cropping_ratio"]').val());
+        formData.set('config[disable_quantity]', form.find('input[name="disable_quantity"]').is(':checked') ? 1 : 0);
 
         $.ajax({
             url: cpiu_admin.ajax_url,
@@ -487,6 +489,9 @@ jQuery(document).ready(function ($) {
         $('#edit_enable_shape_cropping').prop('checked', config.enable_shape_cropping === true || config.enable_shape_cropping === 1 || config.enable_shape_cropping === '1');
         $('#edit_cropping_ratio').val(config.cropping_ratio || 'free');
 
+        // Set quantity lock setting
+        $('#edit_disable_quantity').prop('checked', config.disable_quantity === true || config.disable_quantity === 1 || config.disable_quantity === '1');
+
         // Show/hide resolution settings based on checkbox
         $('.edit-resolution-settings').toggle(config.resolution_validation === true || config.resolution_validation === 1);
 
@@ -525,7 +530,8 @@ jQuery(document).ready(function ($) {
             max_width: parseInt($('#edit_max_width').val(), 10) || 0,
             max_height: parseInt($('#edit_max_height').val(), 10) || 0,
             enable_shape_cropping: $('#edit_enable_shape_cropping').is(':checked') ? 1 : 0,
-            cropping_ratio: $('#edit_cropping_ratio').val()
+            cropping_ratio: $('#edit_cropping_ratio').val(),
+            disable_quantity: $('#edit_disable_quantity').is(':checked') ? 1 : 0
         };
 
         if (!config.button_text || !config.button_text.trim()) {
@@ -553,6 +559,7 @@ jQuery(document).ready(function ($) {
         formData.append('config[max_height]', config.max_height);
         formData.append('config[enable_shape_cropping]', config.enable_shape_cropping);
         formData.append('config[cropping_ratio]', config.cropping_ratio);
+        formData.append('config[disable_quantity]', config.disable_quantity);
 
         // Append allowed types as array
         formData.delete('config[allowed_types]');

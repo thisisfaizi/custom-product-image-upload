@@ -3,7 +3,7 @@
  * Plugin Name:    NDV Product Image Upload for WooCommerce
  * Plugin URI:     https://nowdigiverse.com/products/
  * Description:    Let WooCommerce customers upload and crop images and PDFs for products before checkout, with per-product rules and secure file handling.
- * Version:        1.0.0
+ * Version:        1.1.0
  * Author:         Nowdigiverse
  * Author URI:     https://nowdigiverse.com/
  * License:        GPL v2 or later
@@ -27,7 +27,7 @@ if (!defined('WPINC')) {
 // =========================================================================
 define('CPIU_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('CPIU_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('CPIU_VERSION', '1.0.0');
+define('CPIU_VERSION', '1.1.0');
 define('CPIU_OPTIONS_GROUP', 'cpiu_options_group');
 define('CPIU_OPTIONS_NAME', 'cpiu_settings');
 define('CPIU_UPLOAD_DIR_NAME', 'custom_product_images');
@@ -253,6 +253,7 @@ function cpiu_get_default_multi_product_options()
         'max_height' => 0,
         'enable_shape_cropping' => true,
         'cropping_ratio' => 'free',
+        'disable_quantity' => false,
     );
 }
 

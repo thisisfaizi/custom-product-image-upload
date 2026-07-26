@@ -19,9 +19,9 @@ Update the row **at every transition**, not just at the end (`AGENTS.md` §8.1).
 |---|---|---|---|---|---|
 | T-002 | Answer Q-001 — was this plugin previously live on WP.org under the old slug? | user | `todo` | — | Yes/no recorded in `CONTEXT.md`. If yes: open a task for a migration path + a pointer on the old listing |
 | T-003 | Refresh compatibility headers — `readme.txt` `Tested up to` vs the plugin header's `WC tested up to` | `@compliance` | `todo` | — | Both truthful against current WP/WooCommerce; a recurring cadence agreed and recorded |
-| T-004 | Confirm the hook surface in `CONTRACTS.md` matches the **published** 1.0.0 zip, not just the working copy | `@manager` | `todo` | — | Every filter/action/option in `CONTRACTS.md` verified present in the WP.org release; discrepancies logged |
-| T-005 | "Lock quantity to 1" per-configuration setting — see plan `~/.claude/plans/plan-the-feature-of-sprightly-hamming.md` | `@be` | `todo` | — | New `disable_quantity` boolean added at all 10 touch points listed in the plan; enforced via `woocommerce_is_sold_individually` (return early if already true); default `false`; core-flow regression green; the pre-existing Pro-bulk-save field-reset bug logged as a separate finding (T-006), not fixed as a drive-by |
-| T-006 | Pro's bulk save silently resets `enable_shape_cropping`/`resolution_validation`/dimension limits to defaults on every product it touches (posts only its own fields; base sanitizer defaults everything absent) | `@sec` | `todo` | — | Same failure class already fixed once for Pro's pricing carry-forward. Decide: (a) widen Pro's bulk form, or (b) base sanitizer treats absent-and-previously-set as unchanged for booleans/dimensions. Recorded in `CONTEXT.md` before implementing |
+| T-004 | Confirm the hook surface in `CONTRACTS.md` matches the **published** zip, not just the working copy | `@manager` | `todo` | — | Every filter/action/option in `CONTRACTS.md` verified present in the WP.org release; discrepancies logged |
+| T-006 | Pro's bulk save silently resets `enable_shape_cropping`/`resolution_validation`/dimension limits/**`disable_quantity`** to defaults on every product it touches (posts only its own fields; base sanitizer defaults everything absent) | `@sec` | `todo` | — | Same failure class already fixed once for Pro's pricing carry-forward. Decide: (a) widen Pro's bulk form, or (b) base sanitizer treats absent-and-previously-set as unchanged for booleans/dimensions. Recorded in `CONTEXT.md` before implementing |
+| T-007 | Browser click-through confirmation for T-005 | user | `todo` | — | In the admin: tick "Lock quantity to 1" on a product, save, reload, still ticked; untick, save, reload, still unticked. On the front end: product page quantity input is fixed at 1; cart page shows plain `1`, no input. This is the one surface T-005's automated checks (headless PHP against the real DB) could not exercise — see `LOG.md` |
 
 ## Blocked
 
@@ -31,4 +31,7 @@ Update the row **at every transition**, not just at the end (`AGENTS.md` §8.1).
 
 ## Done
 
-*(nothing yet — this board was created 2026-07-26)*
+| ID | Title | Owner | Status | Merged | Acceptance criteria |
+|---|---|---|---|---|---|
+| T-001 | Build `CLAUDE.md` | `@manager` | `done` | 2026-07-26, `4be653f` | Modules, shared layer, hook surface pointer, conventions and landmines documented |
+| T-005 | "Lock quantity to 1" per-configuration setting | `@be` | `done` | 2026-07-26 (pending commit) | `disable_quantity` boolean added at all 10 touch points; enforced via `woocommerce_is_sold_individually` (never overrides an existing `true`); default `false`. **Verified live** against the real DB (port discovered via Local's `sites.json`, not the on-disk `wp-config.php`): schema/sanitizer round-trip correct, `get_frontend_configuration()` carries the field, filter registered exactly once at priority 10, filter logic correct via reflection stubs (no-config/already-true/malformed-input), and a real product (276) toggled through `save_product_configuration()` → `WC_Product::is_sold_individually()` true then false then cleanly reverted (only `updated_at` differs, unavoidable). `debug.log` shows no new errors. **Not covered by the above:** the actual browser form — checkbox rendering, real POST through `admin-ajax.php`, the rendered quantity input on a live page. Tracked as **T-007** |

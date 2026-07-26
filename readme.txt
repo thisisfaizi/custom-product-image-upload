@@ -4,7 +4,7 @@ Tags: woocommerce, image upload, product customization, cropping, file upload
 Requires at least: 5.9
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,7 @@ Everything is configured per product, so each product can have its own required 
 * **Built-in cropping** — crop before uploading with Cropper.js, including shape presets (square, rectangle, circle, heart) and fixed aspect ratios.
 * **PDF upload support** — accept PDFs alongside images.
 * **Resolution validation** — optionally enforce minimum/maximum image dimensions.
+* **Lock quantity to 1** — optionally prevent customers from ordering more than one of a product they upload artwork for.
 * **Default settings** — define fallback settings used by products without their own configuration.
 * **Global controls** — hide express checkout buttons (Apple Pay, Google Pay, PayPal Express) on product pages, and auto-clean uploaded images from completed/cancelled/refunded orders after a chosen number of days.
 * **Secure file handling** — uploaded files are validated by type, size and content, stored outside the media library, protected with an `.htaccess` rule on Apache/LiteSpeed, and served through a tokenised endpoint.
@@ -74,6 +75,10 @@ JPG, JPEG, PNG, GIF, WEBP and PDF. You can enable or disable types per product.
 
 Yes. Each product can have its own required file count, file-size limit, allowed types, button styling, cropping and resolution rules. Products without a configuration use your Default Settings.
 
+= Can I stop customers ordering more than one of an upload product? =
+
+Yes. Enable "Lock quantity to 1" on that product's configuration (or in Default Settings to apply it broadly). The quantity selector is fixed at 1 on the product page and cart wherever uploads are enabled. If you have already marked a product "Sold individually" in WooCommerce's own product settings, that continues to work as before.
+
 = How are uploads kept secure? =
 
 Every file is validated by type, size and content (including a scan for executable content), filenames are randomised, files are stored in a protected directory, and they are served through a tokenised endpoint. A short cooldown between consecutive guest requests helps deter abuse.
@@ -95,6 +100,9 @@ You choose. On the "Uninstall Preferences" tab you can keep all data (default) o
 3. Default Settings and Global Settings
 
 == Changelog ==
+
+= 1.1.0 =
+* Added: "Lock quantity to 1" per-product (and default) setting, so customers can't order more than one of a product they upload custom artwork for. Enforced via WooCommerce's own `woocommerce_is_sold_individually` filter, so it never overrides a product already marked "Sold individually".
 
 = 1.0.0 =
 * Initial WordPress.org release.

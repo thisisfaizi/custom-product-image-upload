@@ -582,6 +582,20 @@ class CPIU_Admin_Interface
                                         </p>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label><?php esc_html_e('Quantity', 'nowdigiverse-product-image-upload'); ?></label>
+                                    </th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="disable_quantity" value="1" <?php checked(!empty($default_settings['disable_quantity'])); ?>>
+                                            <?php esc_html_e('Lock quantity to 1', 'nowdigiverse-product-image-upload'); ?>
+                                        </label>
+                                        <p class="description">
+                                            <?php esc_html_e('Prevent customers from ordering more than one of a product they upload artwork for.', 'nowdigiverse-product-image-upload'); ?>
+                                        </p>
+                                    </td>
+                                </tr>
                             </table>
                             <p class="submit">
                                 <button type="submit"
@@ -793,6 +807,20 @@ class CPIU_Admin_Interface
                                         </select>
                                         <p class="description">
                                             <?php esc_html_e('Force a specific aspect ratio for cropping.', 'nowdigiverse-product-image-upload'); ?>
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">
+                                        <label><?php esc_html_e('Quantity', 'nowdigiverse-product-image-upload'); ?></label>
+                                    </th>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" name="disable_quantity" value="1" <?php checked(!empty($default_settings['disable_quantity'])); ?>>
+                                            <?php esc_html_e('Lock quantity to 1', 'nowdigiverse-product-image-upload'); ?>
+                                        </label>
+                                        <p class="description">
+                                            <?php esc_html_e('Prevent customers from ordering more than one of this product.', 'nowdigiverse-product-image-upload'); ?>
                                         </p>
                                     </td>
                                 </tr>
@@ -1212,6 +1240,21 @@ class CPIU_Admin_Interface
                                     </select>
                                     <p class="description">
                                         <?php esc_html_e('Force a specific aspect ratio for cropping.', 'nowdigiverse-product-image-upload'); ?>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                    <label><?php esc_html_e('Quantity', 'nowdigiverse-product-image-upload'); ?></label>
+                                </th>
+                                <td>
+                                    <label>
+                                        <input type="checkbox" id="edit_disable_quantity" name="disable_quantity"
+                                            value="1">
+                                        <?php esc_html_e('Lock quantity to 1', 'nowdigiverse-product-image-upload'); ?>
+                                    </label>
+                                    <p class="description">
+                                        <?php esc_html_e('Prevent customers from ordering more than one of this product.', 'nowdigiverse-product-image-upload'); ?>
                                     </p>
                                 </td>
                             </tr>

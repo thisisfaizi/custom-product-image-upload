@@ -343,6 +343,9 @@ class CPIU_Ajax_Handler
             $config_data['enable_shape_cropping'] = isset($raw_config['enable_shape_cropping']) ? (bool) $raw_config['enable_shape_cropping'] : true;
             $config_data['cropping_ratio'] = isset($raw_config['cropping_ratio']) ? sanitize_text_field($raw_config['cropping_ratio']) : 'free';
 
+            // Lock the WooCommerce quantity selector to 1 for this product/variation.
+            $config_data['disable_quantity'] = isset($raw_config['disable_quantity']) ? (bool) $raw_config['disable_quantity'] : false;
+
             // Shape validation settings
             $config_data['shape_validation_enabled'] = isset($raw_config['shape_validation_enabled']) ? (bool) $raw_config['shape_validation_enabled'] : false;
 

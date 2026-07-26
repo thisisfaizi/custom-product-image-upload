@@ -17,7 +17,7 @@ add-to-cart, per-product rules (file count, size, type, resolution, cropping sha
 | Slug (permanent, WP.org) | `nowdigiverse-product-image-upload` |
 | Display name | NDV Product Image Upload for WooCommerce |
 | Internal prefix (permanent, see below) | `cpiu_` |
-| Version | 1.0.0 (main file + `readme.txt` `Stable tag` — must match, `AGENTS.md` §8.1) |
+| Current version | See the main file header / `readme.txt` `Stable tag` — the two must always match (`AGENTS.md` §8.1). Not pinned here: this number churns every release |
 | Floors | PHP 7.2 · WP 5.9 · WooCommerce 3.5 |
 | Upload dir on disk | `wp-content/uploads/custom_product_images/` (constant `CPIU_UPLOAD_DIR_NAME`) |
 
