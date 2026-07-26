@@ -132,3 +132,54 @@ would click. Flagging rather than quietly calling this fully done.
 
 **Next:** T-007 (user click-through) whenever convenient; T-006 (the Pro bulk-save reset bug) is
 independent and can proceed without waiting on it.
+
+---
+
+## 2026-07-26 — T-005: review pass (before marking Done)
+
+**Who:** `@review` · **Task:** T-005 · per `AGENTS.md` §8 nothing ships without a review pass
+
+Two findings from an adversarial read of the diff and the published copy:
+
+**1. Fixed — `readme.txt` FAQ overstated what "Default Settings" does.** The FAQ said enabling the lock in
+Default Settings applies it "broadly" to existing products. Traced `get_frontend_configuration()`
+(`class-cpiu-data-manager.php:775`): unlike `button_text`/`button_color` two lines above (which fall back
+to `get_default_settings()` with `?:`), `disable_quantity` has **no such fallback** — it reads straight off
+the per-product `$config`, which is `wp_parse_args()`'d against the class's hardcoded `default_config`
+(always `false`), never against the Defaults tab. So the Defaults checkbox only pre-fills the Add-form
+checkbox for configurations created afterward; it has zero runtime effect on products already configured.
+This matches what the original plan's own verification item #3 said ("create a new config → inherits the
+default") — the readme copy just claimed more than that. **Fixed** by rewording the FAQ to say it pre-fills
+new configurations rather than applying retroactively. Not treated as a code bug (matching `button_text`'s
+behavior here would be a real behavior change with its own blast radius, out of scope for a copy fix).
+
+**2. Verified, not just claimed — variable-product / per-variation locking.** The plan's verification item
+#7 ("lock one variation, siblings unaffected") had never actually been run — product 276, the only product
+exercised so far, is simple. Found a real variable product on the site (id 80, variations 266/267/268/269)
+and ran a live test: locked `disable_quantity` on variation 266 only, confirmed via fresh `wc_get_product()`
+reads that 267/268/269 and the parent (80) all still read `is_sold_individually() === false`, then reverted
+all five configs and confirmed byte-for-byte match against the originals. Also checked
+`get_available_variations()` — what WooCommerce's own variation-selection JS reads to refresh the quantity
+field after a customer picks a variation — and its `is_sold_individually` flag correctly read `'yes'` for
+266 only, `'no'` for the other three. The variation → parent fallback in
+`get_frontend_configuration($product_id, $variation_id)` behaves correctly for this feature; no code change
+needed. (One inherent, pre-existing WooCommerce behavior noted for the record, not a gap this feature
+introduces: on first page load before a variation is selected, the quantity input reflects the *parent's*
+lock state, since `woocommerce_quantity_input()` fires on the parent object before JS re-renders it against
+the selected variation's `is_sold_individually` flag — identical to how WooCommerce's own per-variation
+"Sold individually" checkbox already behaves, with or without this plugin.)
+
+**Also logged, not fixed (unrelated to T-005, found in passing):** `readme.txt` line 48 lists "CDN cache
+management" as a Pro feature. No such feature exists anywhere in the Pro codebase searched so far this
+session — a false claim in the free plugin's published readme, predating this work. Not fixed here (§3
+rule 5); needs its own task to either build it in Pro or remove the claim.
+
+**Evidence:** `t005-variation-test.php` (scratch, not committed) — locked variation 266, read back all five
+products' `is_sold_individually()` and the parent's `get_available_variations()`, reverted, re-read all five
+to confirm exact match. Output captured in this session's transcript.
+
+**Board:** T-005 confirmed for **Done** (readme fix applied, variable-product criterion verified live).
+Opened T-008 for the "CDN cache management" false-claim cleanup.
+
+**Next:** T-007 (browser click-through) and T-006 (Pro bulk-save reset) remain open, independent of each
+other.

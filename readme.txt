@@ -77,7 +77,7 @@ Yes. Each product can have its own required file count, file-size limit, allowed
 
 = Can I stop customers ordering more than one of an upload product? =
 
-Yes. Enable "Lock quantity to 1" on that product's configuration (or in Default Settings to apply it broadly). The quantity selector is fixed at 1 on the product page and cart wherever uploads are enabled. If you have already marked a product "Sold individually" in WooCommerce's own product settings, that continues to work as before.
+Yes. Enable "Lock quantity to 1" on that product's own configuration. The quantity selector is fixed at 1 on the product page and cart wherever uploads are enabled. (The Default Settings checkbox pre-fills new configurations you create afterwards — it does not retroactively apply to products you've already configured.) If you have already marked a product "Sold individually" in WooCommerce's own product settings, that continues to work as before.
 
 = How are uploads kept secure? =
 
