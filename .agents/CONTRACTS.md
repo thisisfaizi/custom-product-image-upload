@@ -8,7 +8,11 @@
 > shops and the paid add-on depend on it. Removing or changing the signature of any entry requires
 > `@manager` approval and a paired task in the Pro repo, opened *before* the change merges here.
 
-**Base version:** 1.0.0 · **Last audited:** 2026-07-26 (read from source)
+**Base version:** 1.0.0 · **Last audited:** 2026-07-26 (read from source) · **Verified against the
+published WP.org zip:** 2026-07-26, v1.0.0 (T-004) — every filter, action, option, order-item meta key,
+constant, script/style handle, cron hook and the public endpoint confirmed present at matching locations.
+Zero discrepancies. The working copy's 1.1.0 additions (`disable_quantity`) are pending release, not yet
+in the published zip — expected, not a discrepancy.
 
 ---
 

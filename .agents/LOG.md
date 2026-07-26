@@ -262,3 +262,32 @@ hidden.
 "Images Required" reads `3` again, matching the original state.
 
 **Board:** T-006 and T-007 both moved to `done`.
+
+---
+
+## 2026-07-26 — T-004: hook surface verified against the published WP.org zip
+
+**Who:** `@manager` · **Task:** T-004 (base repo), P-021 (Pro repo, same underlying work)
+
+**Did:** Fetched the plugin's actual WP.org API metadata (`api.wordpress.org/plugins/info/1.0/
+nowdigiverse-product-image-upload.json`) to confirm the published version before diffing anything — it's
+**1.0.0**, matching `CONTRACTS.md`'s existing "Base version: 1.0.0" note exactly, so no version-mismatch
+trap to worry about (the working copy's 1.1.0 additions are simply not released yet). Downloaded
+`downloads.wordpress.org/plugin/nowdigiverse-product-image-upload.1.0.0.zip`, extracted it, and grepped the
+actual shipped PHP files for every category `CONTRACTS.md` documents: `apply_filters()`, `do_action()`,
+`get_option`/`update_option`/`add_option` calls, `_cpiu_*` order-item meta keys, `define()` constants,
+`wp_register_script`/`wp_enqueue_script` handles, the cron hook and its two callbacks, `wp_ajax_*` actions,
+and the `cpiu_file` public endpoint.
+
+**Result: zero discrepancies.** Every filter (8), action (5, with `cpiu_file_uploaded`'s 3 call sites),
+option (8), order-item meta key (3), constant (6), and script/style handle (4 custom + bundled `select2`/
+`cropper-js`) matched `CONTRACTS.md`'s documented file:line references exactly — including the cron
+registration at `nowdigiverse-product-image-upload.php:303-304`, character-for-character what `CONTRACTS.md`
+already said.
+
+**Board:** `CONTRACTS.md` stamped with the verification date and result. Pro's own `CONTRACTS.md` mirror
+stamp updated too (P-021) rather than re-doing the same zip diff a second time — it's the same base plugin
+either way. T-004 and P-021 both closed.
+
+**Next:** T-003 (compatibility headers) and P-030 (Pro's regression matrix) — combining into one pass since
+P-030's flows are a superset of what T-003 needs to justify a `WC tested up to` bump.
