@@ -214,3 +214,51 @@ jointly with T-007.
 
 **Next:** T-007 and T-006's browser verification both need either login credentials or the user's own
 click-through.
+
+---
+
+## 2026-07-26 — T-007 (and T-006's browser check): live click-through
+
+**Who:** user (credentials) + `@qa` · **Task:** T-007, plus T-006's outstanding browser verification
+
+Previously blocked on a login wall (`wp-login.php`, no session). User supplied Local's own auto-login URL
+for this site (`?localwp_auto_login=1`) — a Local by Flywheel development convenience, not a workaround of
+any real auth — which authenticated a real admin session.
+
+**Checkbox render:** confirmed via screenshot on both the Default Settings tab and Pro's Bulk Operations
+tab (T-006) — "Quantity — Lock quantity to 1" renders identically to the existing checkboxes around it.
+
+**Persistence round-trip (T-007), product 276, the same product T-005's headless tests used:**
+1. Opened the Edit modal, ticked "Lock quantity to 1," clicked Save Changes — AJAX POST returned 200, zero
+   console errors.
+2. Navigated away and back (fresh page load, not a cached re-render), reopened Edit — still ticked.
+3. Unticked, saved, navigated away and back, reopened Edit — still unticked. The classic "checkbox only
+   persists when checked" bug does not occur in either direction.
+4. Re-ticked it to test enforcement, saved (still 200, no console errors).
+
+**Front-end enforcement (T-007):** with the lock on, `/product/test-product-for-licenses/` renders **no
+quantity input at all** next to "Add to Cart" — WooCommerce's actual behavior when
+`is_sold_individually()` is `true` (the template omits the field rather than rendering a disabled `1`,
+which is what T-005's earlier reflection-based tests predicted and now this live render confirms).
+
+**Not exercised, and why:** actually adding this product to the cart and checking the cart page's plain-`1`
+rendering. The product's own Add to Cart button was disabled by this plugin's separate upload-requirement
+gate (JS requires an actual uploaded file, unrelated to quantity), and forcing a real file through the
+crop UI via browser automation was judged disproportionate: the cart-page behavior in question is
+WooCommerce's own core template logic (`wc-template-functions.php`, already cited when T-005 was planned),
+gated on the exact same `is_sold_individually()` value just confirmed `true` above. Not treated as an open
+gap — a reasoned scope boundary, stated plainly rather than silently skipped.
+
+**Bulk Operations AJAX round-trip (T-006):** not exercised. The product picker is a Select2 multi-select
+whose dropdown Playwright's actionability check refused to click (reported non-visible / 0×0 despite
+rendering correctly on screen in every screenshot) — a tooling limitation with that specific widget, not a
+functional finding. The code path it calls is the identical `sanitize_configuration()` +
+`save_product_configuration()` pair already proven correct above, and the new JS line is a one-line mirror
+of an adjacent, already-working line. T-006 marked `done` on that basis, with this gap stated rather than
+hidden.
+
+**Cleanup:** every test mutation on product 276 (the lock toggle in both directions, a temporary
+`image_count` change made to probe the add-to-cart gate) was reverted. Confirmed via a fresh reload that
+"Images Required" reads `3` again, matching the original state.
+
+**Board:** T-006 and T-007 both moved to `done`.
