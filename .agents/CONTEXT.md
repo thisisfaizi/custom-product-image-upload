@@ -43,6 +43,16 @@ already stored in order-item meta and already sent in order emails. Frozen for t
 
 ---
 
+## Decisions (cross-repo)
+
+### T-006 — Pro's bulk-save gap fixed in the Pro repo, not here. (2026-07-26)
+`disable_quantity` had no control in Pro's Bulk Operations form, so it was always absent from that form's
+POST and silently forced to `false` by this repo's own `sanitize_configuration()` default-fill on every
+product a bulk save touched. Fixed by widening Pro's bulk form (that repo's P-034), **not** by changing
+`sanitize_configuration()`'s absent-field handling here — full reasoning in the Pro repo's `CONTEXT.md`
+D-007. No base-repo code changed; recorded here only because the finding originated during this repo's
+T-005 work and the decision needed a base-repo paper trail too.
+
 ## Open questions
 
 | # | Question | Owner | Status |

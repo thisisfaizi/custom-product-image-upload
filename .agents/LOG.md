@@ -82,12 +82,14 @@ variation → parent via the existing `get_frontend_configuration($product_id, $
 so a variation's own lock wins, falling back to the parent. **Never overrides an existing `true` back to
 `false`** — a merchant's own "Sold individually" checkbox, or another plugin's lock, is never undone.
 
-**Not fixed here (logged separately, T-006):** while adding this field I confirmed the plan's predicted
-bug — `sanitize_configuration()` rebuilds from scratch and merges defaults for any absent key, so Pro's
-bulk save (which posts only its own fields) already silently resets `enable_shape_cropping`,
-`resolution_validation`, and the dimension limits on every product it touches. `disable_quantity` joins
-that list. Per `AGENTS.md` §3 rule 5, not fixed as a drive-by inside this task — T-006 covers it with its
-own decision (widen Pro's bulk form vs. fix the base sanitizer's absent-field handling).
+**Not fixed here (logged separately, T-006):** while adding this field I suspected the plan's predicted
+bug — that `sanitize_configuration()` rebuilds from scratch and merges defaults for any absent key, so
+Pro's bulk save (which posts only its own fields) would silently reset `enable_shape_cropping`,
+`resolution_validation`, and the dimension limits on every product it touches, with `disable_quantity`
+joining that list. **This was only half right — corrected during the T-006 investigation below:** only
+`disable_quantity` has this problem. The other fields are explicitly force-set into `FormData` by
+`cpiu-admin-pro.js` on every bulk submit regardless of checkbox state, so they're deliberately overwritten
+by design, not silently reset. See the T-006 entry for the actual root cause and fix.
 
 **Version:** bumped to 1.1.0 (main file header + `CPIU_VERSION` + `readme.txt` `Stable tag` — all three,
 per `AGENTS.md` §8.1). Changelog entry added; new feature bullet and FAQ entry added to `readme.txt`.
@@ -183,3 +185,32 @@ Opened T-008 for the "CDN cache management" false-claim cleanup.
 
 **Next:** T-007 (browser click-through) and T-006 (Pro bulk-save reset) remain open, independent of each
 other.
+
+---
+
+## 2026-07-26 — T-006: investigated and fixed (in the Pro repo)
+
+**Who:** `@sec` · **Task:** T-006
+
+Re-investigated the claim in this file's earlier T-005 entry that Pro's bulk save silently resets
+`enable_shape_cropping`/`resolution_validation`/dimensions in addition to `disable_quantity` — **that part
+was wrong**, corrected above and in `TASKS.md`. Reading `custom-product-image-upload-pro/assets/js/cpiu-admin-pro.js:87-93`
+shows those fields are explicitly force-set into the bulk-save `FormData` on every submit regardless of
+checkbox state; bulk save deliberately overwrites them, which is correct behavior for a bulk-apply form.
+Only `disable_quantity` had no representation in the form at all.
+
+**Decision:** widen Pro's Bulk Operations form (option (a)) rather than give this repo's
+`sanitize_configuration()` previous-value awareness (option (b)) — full reasoning in
+`custom-product-image-upload-pro/.agents/CONTEXT.md` D-007. Fix lives entirely in the Pro repo
+(`class-cpiu-pro-bulk.php`, `cpiu-admin-pro.js`), tracked there as P-034. No base-repo code changed.
+
+**Also found, not fixed:** the bulk form has no partial-update semantics at all — any bulk save overwrites
+cropping/resolution/dimensions with the form's current values on every selected product, whether the
+merchant meant to touch them or not. Opened as the Pro repo's P-035; out of scope for T-006.
+
+**Not verified live:** the fix is pure HTML/JS, so headless PHP can't exercise it. A real browser session
+hit `wp-login.php` — no authenticated session available in this environment. Blocked on credentials,
+jointly with T-007.
+
+**Next:** T-007 and T-006's browser verification both need either login credentials or the user's own
+click-through.
