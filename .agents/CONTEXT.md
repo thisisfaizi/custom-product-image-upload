@@ -57,7 +57,7 @@ T-005 work and the decision needed a base-repo paper trail too.
 
 | # | Question | Owner | Status |
 |---|---|---|---|
-| Q-001 | Was this plugin previously live on WP.org under the **old** slug `custom-product-image-upload`? If yes, free users on the old slug are stranded — WP.org has no slug-redirect — and need a migration path (and the old listing needs a pointer to the new one). | user | **open** |
+| Q-001 | Was this plugin previously live on WP.org under the **old** slug `custom-product-image-upload`? | user | **closed 2026-07-26 — no.** The old slug was never published on WP.org; only the rebranded `nowdigiverse-product-image-upload` has ever been live. No stranded users, no migration path needed. |
 | Q-002 | `readme.txt` says `Tested up to: 7.0` while the plugin header says `WC tested up to: 9.5`. Both need a routine refresh cadence — who owns it and when? | `@compliance` | **open** |
 
 ---

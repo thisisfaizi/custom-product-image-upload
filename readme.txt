@@ -45,7 +45,6 @@ A separate **Pro add-on** extends this free plugin with:
 * Import / Export all settings as JSON
 * Security Logs dashboard — monitor upload attempts and events
 * Dedicated Elementor widget for the upload interface
-* CDN cache management
 * Per-upload pricing and fees (charge or discount based on uploads)
 
 The Pro add-on requires this free plugin and is available from the developer at https://nowdigiverse.com/. The free plugin is fully functional on its own.
