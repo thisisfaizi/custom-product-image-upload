@@ -58,9 +58,18 @@ T-005 work and the decision needed a base-repo paper trail too.
 | # | Question | Owner | Status |
 |---|---|---|---|
 | Q-001 | Was this plugin previously live on WP.org under the **old** slug `custom-product-image-upload`? | user | **closed 2026-07-26 — no.** The old slug was never published on WP.org; only the rebranded `nowdigiverse-product-image-upload` has ever been live. No stranded users, no migration path needed. |
-| Q-002 | `readme.txt` says `Tested up to: 7.0` while the plugin header says `WC tested up to: 9.5`. Both need a routine refresh cadence — who owns it and when? | `@compliance` | **open** |
+| Q-002 | `readme.txt` says `Tested up to: 7.0` while the plugin header says `WC tested up to: 9.5`. Both need a routine refresh cadence — who owns it and when? | `@compliance` | **closed 2026-07-26 — T-003.** WP line was already accurate. WC line was stale, bumped to 10.9 after actually running the §5.1 regression against the real installed 10.9.4, not just on the strength of "nothing broke." Cadence recorded below. |
 
 ---
+
+## Compatibility refresh cadence (T-003)
+
+Re-run the `AGENTS.md` §5.1 core-flow regression and refresh both `readme.txt`'s `Tested up to` (WP)
+and the plugin header's `WC tested up to` whenever either of these happens:
+- The WooCommerce version installed on the reference dev site changes to a new minor version.
+- At minimum, once per plugin release — never bump either number without having actually run the
+  regression against that version first. "It didn't break during unrelated testing" is not evidence;
+  the number is a compatibility claim merchants act on.
 
 ## Constraints
 

@@ -102,6 +102,7 @@ You choose. On the "Uninstall Preferences" tab you can keep all data (default) o
 
 = 1.1.0 =
 * Added: "Lock quantity to 1" per-product (and default) setting, so customers can't order more than one of a product they upload custom artwork for. Enforced via WooCommerce's own `woocommerce_is_sold_individually` filter, so it never overrides a product already marked "Sold individually".
+* Compatibility: confirmed working against WooCommerce 10.9 (full core-flow regression pass); `WC tested up to` raised from 9.5.
 
 = 1.0.0 =
 * Initial WordPress.org release.

@@ -291,3 +291,82 @@ either way. T-004 and P-021 both closed.
 
 **Next:** T-003 (compatibility headers) and P-030 (Pro's regression matrix) — combining into one pass since
 P-030's flows are a superset of what T-003 needs to justify a `WC tested up to` bump.
+
+---
+
+## 2026-07-26 — T-003 + P-030 + P-048: combined regression pass (real bytes, no browser file-input needed)
+
+**Who:** `@qa` · **Tasks:** T-003, and the base-repo half of Pro's P-030/P-048 (real code exercised is in
+this repo; findings recorded on both boards)
+
+Browser automation here has no file-input capability, so the crop-and-upload UI itself can't be driven
+from a script. Rather than skip §5.1 #2-#5 or fake results, called the exact internal methods the real
+AJAX handlers call (`CPIU_Secure_Upload::process_base64_image()`, `process_raw_file()`,
+`validate_file_security()` via reflection) with real bytes — a genuine tiny JPEG, a real minimal PDF, and
+a PHP payload disguised with a lying `image/jpeg` data-URI prefix. This exercises 100% real validation
+logic; it only skips the literal browser click/drag/crop interaction.
+
+**§5.1 #2-#4 (upload, PDF, rejection paths) — all pass:**
+- Valid JPEG accepted; valid PDF passes validation.
+- PHP bytes claiming to be `image/jpeg` in the data URI: rejected (`Invalid file type` — `finfo`/
+  `exif_imagetype` catch the lie, not the extension).
+- Oversized file: rejected once both the configured limit and the test payload cleared
+  `set_max_file_size()`'s own 1KB floor (a design detail, not a bug — my first attempt used a payload too
+  small to exceed even that floor, a test-harness mistake, not a plugin one).
+- Wrong extension, `.php` renamed to `.jpg`, and `shell.php.jpg` (double extension): all rejected, each by
+  the specific check meant to catch it (extension allowlist, MIME/exif sniffing, the double-extension scan).
+
+**§5.1 #5 (cart → order → file link):**
+- Real `WC_Cart`, product 276 at qty 3, uploaded file attached via the same `cpiu_uploaded_images` cart-item
+  shape the real AJAX handler builds. Real `WC_Order` created from that cart with the fee line and upload
+  order-item meta; meta round-trips (`_cpiu_uploaded_images` reads back the exact stored URL).
+- HMAC token: computed via the plugin's own `cpiu_generate_public_token()`, then hit **the real HTTP
+  endpoint via the browser** (not just computed and trusted) — valid token → 200, the actual 1×1 image
+  rendered; tampered token (last 4 hex chars flipped) → 403 "Security Check Failed". Both confirmed via
+  real network requests, not assumption.
+
+**P-048(b), the percent double-multiply check — a real investigation, not a quick pass/fail:**
+Using product 276's existing pricing config (10% rule, `per_quantity` off) at qty 3 on the 25.00 product,
+the WC-registered fee came back as `3`, not the expected `2.50` — and `8`, not `7.50`, with `per_quantity`
+on. Traced it methodically rather than accepting either "it's a bug" or "close enough": confirmed the rule
+engine's own `evaluate()` returns the mathematically correct `2.5`/`7.5` in every call (direct, via
+`pricing_for_item()`, via a hand-copied replica of `build_breakdown()`'s loop — all agree). Added temporary
+`file_put_contents()` tracing directly inside `build_breakdown()` (reverted immediately after, confirmed via
+`git diff` showing empty) and found `$totals['Upload fee']` is genuinely `2.5` right up to the final
+`round((float) $amount, $decimals)` call. Root cause: **`wc_get_price_decimals()` returns `0` on this
+store**, not the usual `2` — `round(2.5, 0) = 3` and `round(7.5, 0) = 8` under PHP's round-half-away-from-zero
+default. **Not a plugin bug.** The rule engine's pre-rounding math is exactly right in both directions; the
+fee correctly respects whatever precision the store owner configured, however unusual. Re-verified with
+corrected expectations: pre-rounding total 2.50/7.50 (asserted directly against `evaluate()`), WC-registered
+fee `round(2.50, 0)`/`round(7.50, 0)` = 3/8 (asserted against the store's actual decimals setting, not a
+hardcoded `2`). All pass. Pricing config reverted to its original `per_quantity: false` and confirmed
+byte-identical afterward.
+
+**§5.1 #6 (cleanup cron):** `cpiu_cleanup_abandoned_guest_uploads()` and
+`cpiu_cleanup_completed_order_images()` called directly — both run with no fatals, no new `debug.log`
+entries.
+
+**§5.1 #7 (deactivate → reactivate), both plugins, on the real live site:** wrapped in a
+`register_shutdown_function()` safety net that force-reactivates both plugins even on a mid-script fatal,
+before touching anything. Deactivated Pro then base, reactivated base then Pro — both come back active with
+zero errors. `cpiu_settings`, `cpiu_global_settings`, `cpiu_default_settings`, and
+`cpiu_multi_product_configs` all compared byte-identical before/after; the non-autoload flag on
+`cpiu_multi_product_configs` survived the cycle. Confirmed visually in the browser afterward too (both
+plugins show active/highlighted on the Plugins screen). One benign, expected side effect: the "Installation
+Complete!" welcome notice reappeared, since reactivation re-fires the same activation hook a fresh install
+would — not a defect, just worth knowing before being surprised by it.
+
+**§5.1 #8 (Plugin Check): blocked, not run — and not our bug.** The Plugin Check tool spins up its own
+isolated sandbox WordPress install to run checks safely; that sandbox setup itself threw an uncaught
+exception from **Elementor's** kit-settings manager (`Invalid post.` in
+`Elementor\Core\Settings\Page\Manager::ajax_before_save_settings()`, fired via `wp_install()`'s
+`update_option('blogname', ...)` during the sandbox's own setup) — a pre-existing Elementor/Plugin-Check
+incompatibility on this dev site, confirmed via `debug.log`'s full stack trace, with zero mention of any
+`cpiu_*` code anywhere in it. Not attempted to fix (disabling Elementor to unblock this is out of scope and
+risks other working parts of this dev site) — recorded as an environmental blocker, not a passed or failed
+check.
+
+**Board:** T-003 closed (`WC tested up to` bumped 9.5 → 10.9, cadence recorded in `CONTEXT.md`). Pro's
+P-030/P-048 rows updated with this same evidence (see that repo's own `LOG.md`/`TASKS.md`) — the code
+exercised lives entirely in shared/base-repo territory plus Pro's pricing cart class, so one pass covers
+both boards rather than repeating the same work twice.
